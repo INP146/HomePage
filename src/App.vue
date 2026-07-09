@@ -2,36 +2,31 @@
   <!-- 加载 -->
   <Loading />
   <!-- 壁纸 -->
-  <Background @loadComplete="loadComplete" />
+  <Background />
   <!-- 主界面 -->
   <Transition name="fade" mode="out-in">
-    <main id="main" v-if="store.imgLoadStatus">
-      <div class="container" v-show="!store.backgroundShow">
+    <main id="main" v-if="store.appLoadStatus">
+      <div class="container">
         <section class="all">
           <MainLeft />
           <MainRight />
         </section>
       </div>
       <!-- 移动端菜单按钮 -->
-      <Icon
-        class="menu"
-        size="24"
-        v-show="!store.backgroundShow"
-        @click="store.mobileOpenState = !store.mobileOpenState"
-      >
+      <Icon class="menu" size="24" @click="store.mobileOpenState = !store.mobileOpenState">
         <component :is="store.mobileOpenState ? CloseSmall : HamburgerButton" />
       </Icon>
       <!-- 页脚 -->
       <Transition name="fade" mode="out-in">
-        <Footer v-show="!store.backgroundShow" />
+        <Footer />
       </Transition>
     </main>
   </Transition>
 </template>
 <script setup>
-import { helloInit, checkDays } from "@/utils/getTime.js";
 import { HamburgerButton, CloseSmall } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
+import { getGithubContributions, getProjectLinks } from "@/api";
 import { Icon } from "@vicons/utils";
 import Loading from "@/components/Loading.vue";
 import MainLeft from "@/views/Main/Left.vue";
@@ -43,21 +38,20 @@ import config from "@/../package.json";
 
 const store = mainStore();
 
+const initProjectLinks = async () => {
+  const [links, contributions] = await Promise.all([getProjectLinks(), getGithubContributions()]);
+  store.setProjectLinks(links);
+  store.setGithubContributions(contributions.total, contributions.contributions);
+  store.setGithubLoadStatus(true);
+};
+
+initProjectLinks();
+
 // 页面宽度
 const getWidth = () => {
   if (window.innerWidth > 768) {
     store.mobileOpenState = false;
   }
-};
-
-// 加载完成事件
-const loadComplete = () => {
-  nextTick(() => {
-    // 欢迎提示
-    helloInit();
-    // 默哀模式
-    checkDays();
-  });
 };
 
 onMounted(() => {
@@ -67,23 +61,12 @@ onMounted(() => {
   // 屏蔽右键
   document.oncontextmenu = () => {
     ElMessage({
-      message: "为了浏览体验，本站禁用右键",
+      message: "Right-click is disabled for a better browsing experience.",
       grouping: true,
       duration: 2000,
     });
     return false;
   };
-
-  // 鼠标中键事件
-  window.addEventListener("mousedown", (event) => {
-    if (event.button == 1) {
-      store.backgroundShow = !store.backgroundShow;
-      ElMessage({
-        message: `已${store.backgroundShow ? "开启" : "退出"}壁纸展示状态`,
-        grouping: true,
-      });
-    }
-  });
 
   // 监听当前页面宽度
   getWidth();
@@ -93,7 +76,7 @@ onMounted(() => {
   const styleTitle1 = "font-size: 20px;font-weight: 600;color: rgb(244,167,89);";
   const styleTitle2 = "font-size:12px;color: rgb(244,167,89);";
   const styleContent = "color: rgb(30,152,255);";
-  const title1 = "無名の主页";
+  const title1 = "Home";
   const title2 = `
  _____ __  __  _______     ____     __
 |_   _|  \\/  |/ ____\\ \\   / /\\ \\   / /
@@ -101,7 +84,7 @@ onMounted(() => {
   | | | |\\/| |\\___ \\  \\   /    \\   /
  _| |_| |  | |____) |  | |      | |
 |_____|_|  |_|_____/   |_|      |_|`;
-  const content = `\n\n版本: ${config.version}\n主页: ${config.home}\nGithub: ${config.github}`;
+  const content = `\n\nVersion: ${config.version}\nHome: ${config.home}\nGithub: ${config.github}`;
   console.info(`%c${title1} %c${title2} %c${content}`, styleTitle1, styleTitle2, styleContent);
 });
 

@@ -205,16 +205,14 @@ p {
   }
 }
 
-// 滚动条样式
-::-webkit-scrollbar,
-scrollbar {
-  width: 6px;
-  height: 6px;
-  background-color: transparent;
+// 隐藏滚动条
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-::-webkit-scrollbar-thumb,
-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #eeeeee;
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }

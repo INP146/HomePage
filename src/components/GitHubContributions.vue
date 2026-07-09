@@ -10,7 +10,7 @@
       </a>
     </div>
 
-    <div class="calendar-wrap" :class="{ loading: isLoading }">
+    <div ref="calendarWrap" class="calendar-wrap" :class="{ loading: isLoading }">
       <div class="months" :style="monthGridStyle">
         <span
           v-for="month in monthLabels"
@@ -53,8 +53,10 @@
 </template>
 
 <script setup>
+import { mainStore } from "@/store";
 import socialLinks from "@/assets/socialLinks.json";
 
+const store = mainStore();
 const fallbackUser = import.meta.env.VITE_SITE_ANTHOR || "INP146";
 const githubLink = socialLinks.find((item) => item.name?.toLowerCase() === "github");
 const githubUser = computed(() => {
@@ -66,9 +68,10 @@ const profileUrl = computed(() => githubLink?.url || `https://github.com/${githu
 
 const levels = [0, 1, 2, 3, 4];
 const monthFormatter = new Intl.DateTimeFormat("en", { month: "short" });
-const total = ref(0);
-const contributions = ref([]);
-const isLoading = ref(true);
+const total = computed(() => store.githubContributionsTotal);
+const contributions = computed(() => store.githubContributions);
+const isLoading = computed(() => !store.githubLoadStatus);
+const calendarWrap = ref(null);
 
 const createEmptyYear = () => {
   const days = [];
@@ -114,10 +117,10 @@ const calendarDays = computed(() => {
 
 const weekCount = computed(() => Math.ceil(calendarDays.value.length / 7));
 const gridStyle = computed(() => ({
-  gridTemplateColumns: `repeat(${weekCount.value}, minmax(4px, 1fr))`,
+  gridTemplateColumns: `repeat(${weekCount.value}, var(--day-size))`,
 }));
 const monthGridStyle = computed(() => ({
-  gridTemplateColumns: `repeat(${weekCount.value}, minmax(4px, 1fr))`,
+  gridTemplateColumns: `repeat(${weekCount.value}, var(--day-size))`,
 }));
 
 const monthLabels = computed(() => {
@@ -126,7 +129,9 @@ const monthLabels = computed(() => {
 
   for (let weekIndex = 0; weekIndex < weekCount.value; weekIndex += 1) {
     const week = calendarDays.value.slice(weekIndex * 7, weekIndex * 7 + 7);
-    const firstRealDay = week.find((day) => !day.date.startsWith("pad") && !day.date.startsWith("tail"));
+    const firstRealDay = week.find(
+      (day) => !day.date.startsWith("pad") && !day.date.startsWith("tail"),
+    );
     if (!firstRealDay) continue;
 
     const date = new Date(`${firstRealDay.date}T00:00:00`);
@@ -149,32 +154,28 @@ const totalText = computed(() => {
   return `${total.value} contributions in the last year`;
 });
 
-const loadGitHubData = async () => {
-  isLoading.value = true;
-  try {
-    const response = await fetch(`https://github-contributions-api.jogruber.de/v4/${githubUser.value}?y=last`);
-
-    if (response.ok) {
-      const data = await response.json();
-      contributions.value = data.contributions || [];
-      total.value = data.total?.lastYear || 0;
-    }
-  } catch (error) {
-    console.warn("GitHub contributions load failed", error);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
 const openGitHub = () => {
   window.open(profileUrl.value, "_blank");
 };
 
-onMounted(loadGitHubData);
+const scrollToLatest = () => {
+  nextTick(() => {
+    if (!calendarWrap.value) return;
+    calendarWrap.value.scrollLeft = calendarWrap.value.scrollWidth;
+  });
+};
+
+watch([() => contributions.value.length, weekCount], scrollToLatest, {
+  immediate: true,
+  flush: "post",
+});
 </script>
 
 <style lang="scss" scoped>
 .github-card {
+  --day-size: 10px;
+  --day-gap: 4px;
+
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -209,7 +210,7 @@ onMounted(loadGitHubData);
 
     .profile-link {
       flex: 0 0 auto;
-      color: #58a6ff;
+      color: #f0f6fc;
       font-size: 0.95rem;
       line-height: 1.4;
       max-width: 42%;
@@ -221,6 +222,8 @@ onMounted(loadGitHubData);
 
   .calendar-wrap {
     margin-top: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
     transition: opacity 0.3s;
 
     &.loading {
@@ -232,7 +235,8 @@ onMounted(loadGitHubData);
     display: grid;
     margin-left: 34px;
     height: 18px;
-    gap: 4px;
+    gap: var(--day-gap);
+    min-width: max-content;
 
     span {
       color: #ffffffbf;
@@ -245,13 +249,14 @@ onMounted(loadGitHubData);
     display: flex;
     gap: 8px;
     min-width: 0;
+    align-items: flex-start;
   }
 
   .weekdays {
     width: 26px;
     display: grid;
-    grid-template-rows: repeat(7, 1fr);
-    gap: 4px;
+    grid-template-rows: repeat(7, var(--day-size));
+    gap: var(--day-gap);
     flex: 0 0 auto;
 
     span {
@@ -267,39 +272,43 @@ onMounted(loadGitHubData);
   .calendar-grid {
     flex: 1 1 auto;
     display: grid;
-    grid-template-rows: repeat(7, 1fr);
+    grid-template-rows: repeat(7, var(--day-size));
     grid-auto-flow: column;
-    gap: 4px;
-    min-width: 0;
+    gap: var(--day-gap);
+    min-width: max-content;
   }
 
   .day,
   .legend i {
     display: block;
-    width: 100%;
-    aspect-ratio: 1;
-    min-width: 4px;
+    width: var(--day-size);
+    height: var(--day-size);
     border-radius: 2px;
-    background: #161b22cc;
+    background: #30363d;
   }
 
-  .level-0 {
-    background: #161b22cc;
+  .day.level-0,
+  .legend .level-0 {
+    background: #30363d;
   }
 
-  .level-1 {
-    background: #0e4429;
+  .day.level-1,
+  .legend .level-1 {
+    background: #2d6a4f;
   }
 
-  .level-2 {
-    background: #006d32;
+  .day.level-2,
+  .legend .level-2 {
+    background: #238636;
   }
 
-  .level-3 {
-    background: #26a641;
+  .day.level-3,
+  .legend .level-3 {
+    background: #2ea043;
   }
 
-  .level-4 {
+  .day.level-4,
+  .legend .level-4 {
     background: #39d353;
   }
 
@@ -322,7 +331,6 @@ onMounted(loadGitHubData);
     i {
       width: 10px;
       height: 10px;
-      aspect-ratio: auto;
     }
   }
 
@@ -345,8 +353,6 @@ onMounted(loadGitHubData);
     }
 
     .calendar-wrap {
-      overflow-x: auto;
-      overflow-y: hidden;
       padding-bottom: 2px;
       -webkit-overflow-scrolling: touch;
     }

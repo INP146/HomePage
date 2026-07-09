@@ -1,12 +1,12 @@
 <template>
-  <div id="loader-wrapper" :class="store.imgLoadStatus ? 'loaded' : null">
+  <div id="loader-wrapper" :class="store.appLoadStatus ? 'loaded' : null">
     <div class="loader">
       <div class="loader-circle" />
       <div class="loader-text">
         <span class="name">
           {{ siteName }}
         </span>
-        <span class="tip"> 加载中 </span>
+        <span class="tip"> Loading </span>
       </div>
     </div>
     <div class="loader-section section-left" />

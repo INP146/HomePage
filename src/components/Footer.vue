@@ -1,36 +1,21 @@
 <template>
   <footer id="footer" class="blur">
-    <Transition name="fade" mode="out-in">
-      <div v-if="!store.playerState" class="power">
-        <span>
-          Copyright&nbsp;&copy;
-          {{ fullYear }}
-          <a :href="siteUrl">{{ siteAnthor }}</a>
-        </span>
-        <!-- 站点备案 -->
-        <a v-if="siteIcp" href="https://beian.miit.gov.cn" target="_blank">
-          &amp;
-          {{ siteIcp }}
-        </a>
-      </div>
-      <div v-else class="lrc">
-        <Transition name="fade" mode="out-in">
-          <div class="lrc-all" :key="store.getPlayerLrc">
-            <music-one theme="filled" size="18" fill="#efefef" />
-            <span class="lrc-text text-hidden" v-html="store.getPlayerLrc" />
-            <music-one theme="filled" size="18" fill="#efefef" />
-          </div>
-        </Transition>
-      </div>
-    </Transition>
+    <div class="power">
+      <span>
+        Copyright&nbsp;&copy;
+        {{ fullYear }}
+        <a :href="siteUrl">{{ siteAnthor }}</a>
+      </span>
+      <!-- 站点备案 -->
+      <a v-if="siteIcp" href="https://beian.miit.gov.cn" target="_blank">
+        &amp;
+        {{ siteIcp }}
+      </a>
+    </div>
   </footer>
 </template>
 
 <script setup>
-import { MusicOne } from "@icon-park/vue-next";
-import { mainStore } from "@/store";
-
-const store = mainStore();
 const fullYear = new Date().getFullYear();
 
 // 加载配置数据
@@ -60,28 +45,6 @@ const siteUrl = computed(() => {
   font-size: 14px;
   .power {
     animation: fade 0.3s;
-  }
-  .lrc {
-    padding: 0 20px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    .lrc-all {
-      width: 98%;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      .lrc-text {
-        margin: 0 8px;
-      }
-      .i-icon {
-        width: 18px;
-        height: 18px;
-        display: inherit;
-      }
-    }
   }
   &.blur {
     backdrop-filter: blur(10px);

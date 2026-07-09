@@ -1,5 +1,5 @@
 <template>
-  <div v-if="siteLinks[0]" class="links">
+  <div v-if="projectLinks[0]" class="links">
     <div class="line">
       <Icon size="20">
         <Link />
@@ -8,7 +8,7 @@
     </div>
     <!-- 网站列表 -->
     <Swiper
-      v-if="siteLinks[0]"
+      v-if="projectLinks[0]"
       :modules="[Pagination, Mousewheel]"
       :slides-per-view="1"
       :space-between="40"
@@ -21,16 +21,27 @@
     >
       <SwiperSlide v-for="site in siteLinksList" :key="site">
         <el-row class="link-all" :gutter="20">
-          <el-col v-for="(item, index) in site" :span="8" :key="item">
+          <el-col v-for="(item, index) in site" :span="12" :key="item">
             <div
               class="item cards"
-              :style="index < 3 ? 'margin-bottom: 20px' : null"
+              :style="index < 2 ? 'margin-bottom: 20px' : null"
               @click="jumpLink(item)"
             >
-              <Icon size="26">
-                <component :is="siteIcon[item.icon]" />
+              <img
+                v-if="isImageIcon(item.icon)"
+                class="site-icon"
+                :src="formatImageIcon(item.icon)"
+                :alt="item.name"
+              />
+              <Icon v-else class="site-icon" size="26">
+                <component :is="getSiteIcon(item.icon)" />
               </Icon>
-              <span class="name text-hidden">{{ item.name }}</span>
+              <div class="project-copy">
+                <span class="name text-hidden" :title="item.name">{{ item.name }}</span>
+                <span v-if="item.description" class="description" :title="item.description">
+                  {{ item.description }}
+                </span>
+              </div>
             </div>
           </el-col>
         </el-row>
@@ -43,16 +54,29 @@
 <script setup>
 import { Icon } from "@vicons/utils";
 // 可前往 https://www.xicons.org 自行挑选并在此处引入
-import { Link, Blog, CompactDisc, Cloud, Compass, Book, Fire, LaptopCode } from "@vicons/fa"; // 注意使用正确的类别
+import {
+  Link,
+  Github,
+  Blog,
+  CompactDisc,
+  Cloud,
+  Compass,
+  Book,
+  Fire,
+  LaptopCode,
+} from "@vicons/fa"; // 注意使用正确的类别
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { Pagination, Mousewheel } from "swiper";
-import siteLinks from "@/assets/siteLinks.json";
+import { mainStore } from "@/store";
+
+const store = mainStore();
+const projectLinks = computed(() => store.projectLinks);
 
 // 计算网站链接
 const siteLinksList = computed(() => {
   const result = [];
-  for (let i = 0; i < siteLinks.length; i += 6) {
-    const subArr = siteLinks.slice(i, i + 6);
+  for (let i = 0; i < projectLinks.value.length; i += 4) {
+    const subArr = projectLinks.value.slice(i, i + 4);
     result.push(subArr);
   }
   return result;
@@ -60,6 +84,7 @@ const siteLinksList = computed(() => {
 
 // 网站链接图标
 const siteIcon = {
+  Github,
   Blog,
   Cloud,
   CompactDisc,
@@ -69,14 +94,26 @@ const siteIcon = {
   LaptopCode,
 };
 
+const imageIconPattern =
+  /^(https?:)?\/\/|^(data|blob):|^\.{0,2}\/|^\w+\/|.*\.(png|jpe?g|webp|gif|svg|ico)(\?.*)?$/i;
+
+const isImageIcon = (icon) => {
+  return typeof icon === "string" && imageIconPattern.test(icon);
+};
+
+const formatImageIcon = (icon) => {
+  if (/^(https?:)?\/\/|^(data|blob):|^\.{0,2}\//i.test(icon)) return icon;
+  return icon.startsWith("/") ? icon : `/${icon}`;
+};
+
+const getSiteIcon = (icon) => {
+  return siteIcon[icon] || Github;
+};
+
 // 链接跳转
 const jumpLink = (data) => {
   window.open(data.link, "_blank");
 };
-
-onMounted(() => {
-  console.log(siteLinks);
-});
 </script>
 
 <style lang="scss" scoped>
@@ -130,8 +167,9 @@ onMounted(() => {
       display: flex;
       align-items: center;
       flex-direction: row;
-      justify-content: center;
-      padding: 0 10px;
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 0 12px;
       animation: fade 0.5s;
 
       &:hover {
@@ -144,9 +182,33 @@ onMounted(() => {
         transform: scale(1);
       }
 
+      .project-copy {
+        min-width: 0;
+        flex: 1 1 auto;
+        text-align: left;
+      }
       .name {
+        display: block;
+        width: 100%;
         font-size: 1.1rem;
-        margin-left: 8px;
+        line-height: 1.25;
+      }
+      .description {
+        display: -webkit-box;
+        margin-top: 4px;
+        color: #ffffffb3;
+        font-size: 0.78rem;
+        line-height: 1.25;
+        overflow: hidden;
+        word-break: break-word;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+      .site-icon {
+        width: 26px;
+        height: 26px;
+        object-fit: contain;
+        flex: 0 0 26px;
       }
       @media (min-width: 769px) and (max-width: 820px) {
         .name {
@@ -158,10 +220,14 @@ onMounted(() => {
       }
       @media (max-width: 460px) {
         flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 6px;
         .name {
           font-size: 1rem;
-          margin-left: 0;
-          margin-top: 8px;
+        }
+        .description {
+          font-size: 0.72rem;
         }
       }
     }

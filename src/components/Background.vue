@@ -1,5 +1,5 @@
 <template>
-  <div :class="store.backgroundShow ? 'cover show' : 'cover'">
+  <div class="cover">
     <img
       v-show="store.imgLoadStatus"
       :src="bgUrl"
@@ -9,17 +9,7 @@
       @error.once="imgLoadError"
       @animationend="imgAnimationEnd"
     />
-    <div :class="store.backgroundShow ? 'gray hidden' : 'gray'" />
-    <Transition name="fade" mode="out-in">
-      <a
-        v-if="store.backgroundShow"
-        class="down"
-        :href="bgUrl"
-        target="_blank"
-      >
-        下载壁纸
-      </a>
-    </Transition>
+    <div class="gray" />
   </div>
 </template>
 
@@ -30,7 +20,6 @@ import { Error } from "@icon-park/vue-next";
 const store = mainStore();
 const bgUrl = ref(null);
 const imgTimeout = ref(null);
-const emit = defineEmits(["loadComplete"]);
 
 // 壁纸随机数
 // 请依据文件夹内的图片个数修改 Math.random() 后面的第一个数字
@@ -48,16 +37,14 @@ const imgLoadComplete = () => {
 
 // 图片动画完成
 const imgAnimationEnd = () => {
-  console.log("壁纸加载且动画完成");
-  // 加载完成事件
-  emit("loadComplete");
+  console.log("Wallpaper loaded and animation completed");
 };
 
 // 图片显示失败
 const imgLoadError = () => {
-  console.error("壁纸加载失败：", bgUrl.value);
+  console.error("Wallpaper failed to load:", bgUrl.value);
   ElMessage({
-    message: "壁纸加载失败，已临时切换回默认",
+    message: "Wallpaper failed to load. Switched to the default temporarily.",
     icon: h(Error, {
       theme: "filled",
       fill: "#efefef",
@@ -86,10 +73,6 @@ onBeforeUnmount(() => {
   transition: 0.25s;
   z-index: -1;
 
-  &.show {
-    z-index: 1;
-  }
-
   .bg {
     position: absolute;
     left: 0;
@@ -112,39 +95,11 @@ onBeforeUnmount(() => {
     top: 0;
     width: 100%;
     height: 100%;
-    background-image: radial-gradient(rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.5) 100%),
+    background-image:
+      radial-gradient(rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.5) 100%),
       radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.3) 166%);
 
     transition: 1.5s;
-    &.hidden {
-      opacity: 0;
-      transition: 1.5s;
-    }
-  }
-  .down {
-    font-size: 16px;
-    color: white;
-    position: absolute;
-    bottom: 30px;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    display: block;
-    padding: 20px 26px;
-    border-radius: 8px;
-    background-color: #00000030;
-    width: 120px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    &:hover {
-      transform: scale(1.05);
-      background-color: #00000060;
-    }
-    &:active {
-      transform: scale(1);
-    }
   }
 }
 </style>

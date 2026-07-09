@@ -304,9 +304,9 @@ onMounted(loadActivity);
 
     a {
       min-width: 0;
-      color: #58a6ff;
+      color: #f0f6fc;
       font-size: 0.9rem;
-      border-bottom: 1px solid #58a6ff;
+      border-bottom: 1px solid #ffffff55;
     }
 
     span {
