@@ -4,7 +4,7 @@
       <Icon size="20">
         <Link />
       </Icon>
-      <span class="title">网站列表</span>
+      <span class="title">PROJECTS</span>
     </div>
     <!-- 网站列表 -->
     <Swiper
@@ -44,12 +44,9 @@
 import { Icon } from "@vicons/utils";
 // 可前往 https://www.xicons.org 自行挑选并在此处引入
 import { Link, Blog, CompactDisc, Cloud, Compass, Book, Fire, LaptopCode } from "@vicons/fa"; // 注意使用正确的类别
-import { mainStore } from "@/store";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { Pagination, Mousewheel } from "swiper";
 import siteLinks from "@/assets/siteLinks.json";
-
-const store = mainStore();
 
 // 计算网站链接
 const siteLinksList = computed(() => {
@@ -74,11 +71,7 @@ const siteIcon = {
 
 // 链接跳转
 const jumpLink = (data) => {
-  if (data.name === "音乐" && store.musicClick) {
-    if (typeof $openList === "function") $openList();
-  } else {
-    window.open(data.link, "_blank");
-  }
+  window.open(data.link, "_blank");
 };
 
 onMounted(() => {
@@ -88,8 +81,14 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .links {
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
   .line {
-    margin: 2rem 0.25rem 1rem;
+    margin: 0 0.25rem 1rem;
     font-size: 1.1rem;
     display: flex;
     align-items: center;
@@ -149,12 +148,12 @@ onMounted(() => {
         font-size: 1.1rem;
         margin-left: 8px;
       }
-      @media (min-width: 720px) and (max-width: 820px) {
+      @media (min-width: 769px) and (max-width: 820px) {
         .name {
           display: none;
         }
       }
-      @media (max-width: 720px) {
+      @media (max-width: 768px) {
         height: 80px;
       }
       @media (max-width: 460px) {
@@ -166,9 +165,14 @@ onMounted(() => {
         }
       }
     }
-    @media (max-width: 720px) {
+    @media (max-width: 768px) {
       height: 180px;
     }
+  }
+
+  @media (max-width: 768px) {
+    height: auto;
+    flex: 0 0 auto;
   }
 }
 </style>

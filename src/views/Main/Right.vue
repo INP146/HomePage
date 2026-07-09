@@ -1,63 +1,65 @@
 <template>
   <div :class="store.mobileOpenState ? 'right' : 'right hidden'">
-    <!-- 移动端 Logo -->
-    <div class="logo text-hidden" @click="store.mobileFuncState = !store.mobileFuncState">
-      <span class="bg">{{ siteUrl[0] }}</span>
-      <span class="sm">.{{ siteUrl[1] }}</span>
-    </div>
-    <!-- 功能区 -->
-    <Func />
     <!-- 网站链接 -->
     <Link />
+    <!-- 移动端 Github 热力图 -->
+    <GitHubContributions class="mobile-contributions" />
+    <!-- Github 动态 -->
+    <GitHubActivity />
   </div>
 </template>
 
 <script setup>
 import { mainStore } from "@/store";
-import Func from "@/views/Func/index.vue";
 import Link from "@/components/Links.vue";
+import GitHubActivity from "@/components/GitHubActivity.vue";
+import GitHubContributions from "@/components/GitHubContributions.vue";
 const store = mainStore();
-
-// 站点链接
-const siteUrl = computed(() => {
-  const url = import.meta.env.VITE_SITE_URL;
-  if (!url) return "imsyy.top".split(".");
-  // 判断协议前缀
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    const urlFormat = url.replace(/^(https?:\/\/)/, "");
-    return urlFormat.split(".");
-  }
-  return url.split(".");
-});
 </script>
 
 <style lang="scss" scoped>
 .right {
   // flex: 1 0 0%;
   width: 50%;
+  height: auto;
   margin-left: 0.75rem;
-  .logo {
-    width: 100%;
-    font-family: "Pacifico-Regular";
-    font-size: 1.75rem;
-    position: fixed;
-    top: 6%;
-    left: 0;
-    text-align: center;
-    transition: transform 0.3s;
-    animation: fade 0.5s;
-    &:active {
-      transform: scale(0.95);
-    }
-    @media (min-width: 720px) {
-      display: none;
-    }
+  display: grid;
+  grid-template-rows: 330px 260px;
+  align-content: start;
+  gap: 18px;
+  align-items: stretch;
+
+  .mobile-contributions {
+    display: none;
   }
-  @media (max-width: 720px) {
+
+  @media (max-width: 768px) {
+    height: 100dvh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     margin-left: 0;
     width: 100%;
+    padding:
+      calc(58px + env(safe-area-inset-top)) 0.75rem
+      calc(160px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scroll-padding-bottom: calc(160px + env(safe-area-inset-bottom));
+    -webkit-overflow-scrolling: touch;
+
+    > * {
+      flex: 0 0 auto;
+    }
+
     &.hidden {
       display: none;
+    }
+
+    .mobile-contributions {
+      display: flex;
     }
   }
 }

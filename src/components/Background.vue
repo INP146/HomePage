@@ -12,7 +12,7 @@
     <div :class="store.backgroundShow ? 'gray hidden' : 'gray'" />
     <Transition name="fade" mode="out-in">
       <a
-        v-if="store.backgroundShow && store.coverType != '3'"
+        v-if="store.backgroundShow"
         class="down"
         :href="bgUrl"
         target="_blank"
@@ -35,19 +35,6 @@ const emit = defineEmits(["loadComplete"]);
 // 壁纸随机数
 // 请依据文件夹内的图片个数修改 Math.random() 后面的第一个数字
 const bgRandom = Math.floor(Math.random() * 10 + 1);
-
-// 更换壁纸链接
-const changeBg = (type) => {
-  if (type == 0) {
-    bgUrl.value = `/images/background${bgRandom}.jpg`;
-  } else if (type == 1) {
-    bgUrl.value = "https://api.dujin.org/bing/1920.php";
-  } else if (type == 2) {
-    bgUrl.value = "https://api.aixiaowai.cn/gqapi/gqapi.php";
-  } else if (type == 3) {
-    bgUrl.value = "https://api.aixiaowai.cn/api/api.php";
-  }
-};
 
 // 图片加载完成
 const imgLoadComplete = () => {
@@ -79,17 +66,9 @@ const imgLoadError = () => {
   bgUrl.value = `/images/background${bgRandom}.jpg`;
 };
 
-// 监听壁纸切换
-watch(
-  () => store.coverType,
-  (value) => {
-    changeBg(value);
-  },
-);
-
 onMounted(() => {
   // 加载壁纸
-  changeBg(store.coverType);
+  bgUrl.value = `/images/background${bgRandom}.jpg`;
 });
 
 onBeforeUnmount(() => {

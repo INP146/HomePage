@@ -7,13 +7,9 @@
   <Transition name="fade" mode="out-in">
     <main id="main" v-if="store.imgLoadStatus">
       <div class="container" v-show="!store.backgroundShow">
-        <section class="all" v-show="!store.setOpenState">
+        <section class="all">
           <MainLeft />
-          <MainRight v-show="!store.boxOpenState" />
-          <Box v-show="store.boxOpenState" />
-        </section>
-        <section class="more" v-show="store.setOpenState" @click="store.setOpenState = false">
-          <MoreSet />
+          <MainRight />
         </section>
       </div>
       <!-- 移动端菜单按钮 -->
@@ -27,7 +23,7 @@
       </Icon>
       <!-- 页脚 -->
       <Transition name="fade" mode="out-in">
-        <Footer v-show="!store.backgroundShow && !store.setOpenState" />
+        <Footer v-show="!store.backgroundShow" />
       </Transition>
     </main>
   </Transition>
@@ -42,8 +38,6 @@ import MainLeft from "@/views/Main/Left.vue";
 import MainRight from "@/views/Main/Right.vue";
 import Background from "@/components/Background.vue";
 import Footer from "@/components/Footer.vue";
-import Box from "@/views/Box/index.vue";
-import MoreSet from "@/views/MoreSet/index.vue";
 import cursorInit from "@/utils/cursor.js";
 import config from "@/../package.json";
 
@@ -51,7 +45,9 @@ const store = mainStore();
 
 // 页面宽度
 const getWidth = () => {
-  store.setInnerWidth(window.innerWidth);
+  if (window.innerWidth > 768) {
+    store.mobileOpenState = false;
+  }
 };
 
 // 加载完成事件
@@ -63,16 +59,6 @@ const loadComplete = () => {
     checkDays();
   });
 };
-
-// 监听宽度变化
-watch(
-  () => store.innerWidth,
-  (value) => {
-    if (value < 990) {
-      store.boxOpenState = false;
-    }
-  },
-);
 
 onMounted(() => {
   // 自定义鼠标
@@ -148,19 +134,19 @@ onBeforeUnmount(() => {
       justify-content: center;
       align-items: center;
     }
-    .more {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #00000080;
-      backdrop-filter: blur(20px);
-      z-index: 2;
-      animation: fade 0.5s;
-    }
     @media (max-width: 1200px) {
       padding: 0 2vw;
+    }
+
+    @media (max-width: 768px) {
+      overflow-x: hidden;
+
+      .all {
+        height: 100%;
+        min-height: 100%;
+        padding: 0 0.75rem;
+        align-items: center;
+      }
     }
   }
   .menu {
@@ -168,7 +154,7 @@ onBeforeUnmount(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    top: 84%;
+    bottom: calc(62px + env(safe-area-inset-bottom));
     left: calc(50% - 28px);
     width: 56px;
     height: 34px;
@@ -183,7 +169,7 @@ onBeforeUnmount(() => {
     .i-icon {
       transform: translateY(2px);
     }
-    @media (min-width: 721px) {
+    @media (min-width: 769px) {
       display: none;
     }
   }

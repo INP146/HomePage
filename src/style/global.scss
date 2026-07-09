@@ -27,8 +27,8 @@
   @include changeWidth($maxWidth: 900px);
 }
 
-/* 小于720px时 */
-@media (max-width: 720px) {
+/* 小于等于768px时 */
+@media (max-width: 768px) {
   // 隐藏元素
   .xs-hidden {
     display: none;

@@ -1,22 +1,11 @@
 <template>
-  <footer id="footer" :class="store.footerBlur ? 'blur' : null">
+  <footer id="footer" class="blur">
     <Transition name="fade" mode="out-in">
-      <div v-if="!store.playerState || !store.playerLrcShow" class="power">
+      <div v-if="!store.playerState" class="power">
         <span>
           Copyright&nbsp;&copy;
-          <span v-if="siteStartDate?.length >= 4" class="site-start">
-            {{ siteStartDate.substring(0, 4) }}
-            -
-          </span>
           {{ fullYear }}
           <a :href="siteUrl">{{ siteAnthor }}</a>
-        </span>
-        <!-- 以下信息请不要修改哦 -->
-        <span class="hidden">
-          &amp;&nbsp;Made&nbsp;by
-          <a :href="config.github" target="_blank">
-            {{ config.author }}
-          </a>
         </span>
         <!-- 站点备案 -->
         <a v-if="siteIcp" href="https://beian.miit.gov.cn" target="_blank">
@@ -40,13 +29,11 @@
 <script setup>
 import { MusicOne } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
-import config from "@/../package.json";
 
 const store = mainStore();
 const fullYear = new Date().getFullYear();
 
 // 加载配置数据
-const siteStartDate = ref(import.meta.env.VITE_SITE_START);
 const siteIcp = ref(import.meta.env.VITE_SITE_ICP);
 const siteAnthor = ref(import.meta.env.VITE_SITE_ANTHOR);
 const siteUrl = computed(() => {
@@ -105,8 +92,12 @@ const siteUrl = computed(() => {
   .fade-leave-active {
     transition: opacity 0.15s ease-in-out;
   }
-  @media (max-width: 720px) {
+  @media (max-width: 768px) {
     font-size: 0.85rem;
+    height: calc(46px + env(safe-area-inset-bottom));
+    line-height: 46px;
+    padding-bottom: env(safe-area-inset-bottom);
+
     &.blur {
       font-size: 0.85rem;
     }

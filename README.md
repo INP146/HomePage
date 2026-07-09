@@ -20,11 +20,7 @@
 ### 功能
 
 - [x] 载入动画
-- [x] 站点简介
-- [x] Hitokoto 一言
 - [x] 日期及时间
-- [x] 实时天气
-- [x] 时光进度条
 - [x] 音乐播放器
 - [x] 移动端适配
 
@@ -122,15 +118,6 @@ const siteIcon = {
 
 在 `src/assets/socialLinks.json` 中可以自定义社交链接。
 
-### 天气
-
-天气及地区获取需要 `高德开放平台` 相关 API
-
-- 前往 [高德开放平台控制台](https://console.amap.com/dev/index) 创建一个 `Web 服务` 类型的 `Key`，并将 `Key` 填入 `.env` 中的 `VITE_WEATHER_KEY` 中
-
-也可自行更换其他方式
-
-
 ### 音乐
 
 >本项目采用了基于 `MetingJS` 的 `Aplayer` 音乐播放器，可实现快速自定义歌单  
@@ -227,9 +214,6 @@ if (type == 0) {
 
 * [小歪 API](https://api.aixiaowai.cn)
 * [搏天 API](https://api.btstu.cn/doc/sjbz.php)
-* [教书先生 API](https://api.oioweb.cn/doc/weather/GetWeather)
-* [高德开放平台](https://lbs.amap.com/)
-* [Hitokoto 一言](https://hitokoto.cn/)
 
 ## Star History
 

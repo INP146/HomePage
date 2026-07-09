@@ -45,7 +45,6 @@ export default ({ mode }) =>
         manifest: {
           name: loadEnv(mode, process.cwd()).VITE_SITE_NAME,
           short_name: loadEnv(mode, process.cwd()).VITE_SITE_NAME,
-          description: loadEnv(mode, process.cwd()).VITE_SITE_DES,
           display: "standalone",
           start_url: "/",
           theme_color: "#424242",
