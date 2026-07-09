@@ -184,14 +184,19 @@ const jumpLink = (data) => {
 
       .project-copy {
         min-width: 0;
+        overflow: hidden;
         flex: 1 1 auto;
         text-align: left;
       }
       .name {
         display: block;
+        min-width: 0;
         width: 100%;
         font-size: 1.1rem;
         line-height: 1.25;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
       .description {
         display: -webkit-box;
@@ -201,6 +206,7 @@ const jumpLink = (data) => {
         line-height: 1.25;
         overflow: hidden;
         word-break: break-word;
+        text-overflow: ellipsis;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
       }
@@ -217,17 +223,38 @@ const jumpLink = (data) => {
       }
       @media (max-width: 768px) {
         height: 80px;
+        .name {
+          font-size: 1rem;
+        }
       }
-      @media (max-width: 460px) {
+      @media (max-width: 460px), (max-width: 768px) and (max-height: 780px) {
         flex-direction: column;
         align-items: flex-start;
         justify-content: center;
         gap: 6px;
+        padding: 8px 10px;
+        overflow: hidden;
+
+        .project-copy {
+          width: 100%;
+          flex: 0 1 auto;
+        }
         .name {
-          font-size: 1rem;
+          max-width: 100%;
         }
         .description {
           font-size: 0.72rem;
+          -webkit-line-clamp: 1;
+        }
+        .site-icon {
+          width: 20px;
+          height: 20px;
+          flex: 0 0 18px;
+        }
+      }
+      @media (max-width: 460px) {
+        .name {
+          font-size: 1rem;
         }
       }
     }
