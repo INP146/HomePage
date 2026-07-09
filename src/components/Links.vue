@@ -9,15 +9,12 @@
     <!-- 网站列表 -->
     <Swiper
       v-if="projectLinks[0]"
-      :modules="[Pagination, Mousewheel]"
+      :modules="[Mousewheel]"
       :slides-per-view="1"
       :space-between="40"
-      :pagination="{
-        el: '.swiper-pagination',
-        clickable: true,
-        bulletElement: 'div',
-      }"
       :mousewheel="true"
+      @swiper="setSwiper"
+      @slide-change="setActiveSlide"
     >
       <SwiperSlide v-for="site in siteLinksList" :key="site">
         <el-row class="link-all" :gutter="20">
@@ -38,16 +35,28 @@
               </Icon>
               <div class="project-copy">
                 <span class="name text-hidden" :title="item.name">{{ item.name }}</span>
-                <span v-if="item.description" class="description" :title="item.description">
-                  {{ item.description }}
+                <span
+                  class="description"
+                  :class="{ placeholder: !item.description }"
+                  :title="item.description"
+                >
+                  {{ item.description || "No description provided" }}
                 </span>
               </div>
             </div>
           </el-col>
         </el-row>
       </SwiperSlide>
-      <div class="swiper-pagination" />
     </Swiper>
+    <div v-if="siteLinksList.length > 1" class="page-dots">
+      <button
+        v-for="(_, index) in siteLinksList"
+        :key="index"
+        :class="{ active: index === activeSlide }"
+        :aria-label="`Go to project page ${index + 1}`"
+        @click="goToSlide(index)"
+      />
+    </div>
   </div>
 </template>
 
@@ -66,11 +75,13 @@ import {
   LaptopCode,
 } from "@vicons/fa"; // 注意使用正确的类别
 import { Swiper, SwiperSlide } from "swiper/vue";
-import { Pagination, Mousewheel } from "swiper";
+import { Mousewheel } from "swiper";
 import { mainStore } from "@/store";
 
 const store = mainStore();
 const projectLinks = computed(() => store.projectLinks);
+const swiperRef = ref(null);
+const activeSlide = ref(0);
 
 // 计算网站链接
 const siteLinksList = computed(() => {
@@ -110,6 +121,19 @@ const getSiteIcon = (icon) => {
   return siteIcon[icon] || Github;
 };
 
+const setSwiper = (swiper) => {
+  swiperRef.value = swiper;
+};
+
+const setActiveSlide = (swiper) => {
+  activeSlide.value = swiper.activeIndex;
+};
+
+const goToSlide = (index) => {
+  swiperRef.value?.slideTo(index);
+  activeSlide.value = index;
+};
+
 // 链接跳转
 const jumpLink = (data) => {
   window.open(data.link, "_blank");
@@ -144,18 +168,35 @@ const jumpLink = (data) => {
     .swiper-slide {
       height: 100%;
     }
-    .swiper-pagination {
-      position: static;
-      margin-top: 4px;
-      :deep(.swiper-pagination-bullet) {
-        background-color: #fff;
-        width: 18px;
-        height: 4px;
-        border-radius: 4px;
-        transition: opacity 0.3s;
-        &:hover {
-          opacity: 1;
-        }
+  }
+  .page-dots {
+    height: 12px;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    button {
+      width: 18px;
+      height: 4px;
+      padding: 0;
+      border: 0;
+      border-radius: 4px;
+      background: #ffffff55;
+      cursor: pointer;
+      transition:
+        background 0.3s,
+        width 0.3s,
+        opacity 0.3s;
+
+      &.active {
+        width: 24px;
+        background: #fff;
+      }
+
+      &:hover {
+        opacity: 0.85;
       }
     }
   }
@@ -209,6 +250,11 @@ const jumpLink = (data) => {
         text-overflow: ellipsis;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
+
+        &.placeholder {
+          color: #ffffff66;
+          font-style: italic;
+        }
       }
       .site-icon {
         width: 26px;
