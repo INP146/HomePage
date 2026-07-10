@@ -13,7 +13,7 @@ interface PublicSiteConfig {
   twitter?: string;
 }
 
-const githubApi = import.meta.env.VITE_GITHUB_API || "https://gh-pinned-repo.inp.la/";
+const githubApi = import.meta.env.VITE_GITHUB_API || "https://gh-api.inp.la/";
 
 export const siteConfig = reactive({
   author: import.meta.env.VITE_SITE_AUTHOR || "INP146",

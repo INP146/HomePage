@@ -29,15 +29,6 @@ A developer-focused personal homepage built with Vue 3. It brings together proje
 
 ## Deployment
 
-### Create a GitHub Token
-
-The Worker uses this token to request GitHub GraphQL data; it is never exposed to the browser.
-
-1. Open [GitHub token settings](https://github.com/settings/personal-access-tokens/new).
-2. Create a **fine-grained personal access token**, choose an expiration date, and set the resource owner to your account.
-3. Select **Public Repositories (read-only)**. No additional permissions are required for public pinned repositories and contribution data.
-4. Generate and copy the token immediately. GitHub will not show it again.
-
 ### Deploy a Full Cloudflare Worker
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/INP146/HomePage)
@@ -46,7 +37,7 @@ The button is the shortest route:
 
 1. Click the button.
 2. Sign in to Cloudflare and connect GitHub or GitLab.
-3. Fill in the Worker name, the token created above, and these public site fields:
+3. Fill in the Worker name, a [GitHub Token](https://github.com/settings/personal-access-tokens/new) (select **fine-grained personal access token** and **Public Repositories (read-only)**), and these public site fields:
    - `VITE_GITHUB_USERNAME`
    - `VITE_SITE_AUTHOR`
    - `VITE_SITE_KEYWORDS`
@@ -54,31 +45,45 @@ The button is the shortest route:
    - To configure an ICP record or social links, add these public variables as needed under the form's **Advanced settings**: `VITE_SITE_ICP`, `VITE_SOCIAL_EMAIL`, `VITE_SOCIAL_TWITTER`, `VITE_SOCIAL_TELEGRAM`, `VITE_SOCIAL_QQ`, and `VITE_SOCIAL_BILIBILI`.
 4. Deploy.
 
-To deploy from your local checkout instead:
+### Self-host the Frontend
 
-1. Install dependencies with `pnpm install`.
-2. Run `pnpm exec wrangler secret put GITHUB_TOKEN --config wrangler.jsonc` and paste the token created above.
-3. Change the Worker name in `wrangler.jsonc` if needed, then run:
+Copy `.env.example` to `.env`, set at least your GitHub username, and adjust the remaining site fields as needed:
+
+```dotenv
+VITE_GITHUB_USERNAME="your-github-username"
+# Leave empty to use the public GitHub API Worker
+VITE_GITHUB_API=""
+```
+
+Install dependencies and build:
+
+```bash
+pnpm install
+pnpm build
+```
+
+The build output is in `dist/`; upload it to any static hosting provider.
+
+The public GitHub API Worker is used by default. To use your own GitHub Token or API Worker, follow the steps below.
+
+### Deploy Your Own API Worker
+
+The Worker uses a GitHub Token to request GraphQL data; the token is never exposed to the browser.
+
+1. Open [GitHub token settings](https://github.com/settings/personal-access-tokens/new), create a **fine-grained personal access token**, and select **Public Repositories (read-only)** for repository access.
+2. Run the following command and paste the token:
 
    ```bash
-   pnpm deploy:cloudflare
+   pnpm exec wrangler secret put GITHUB_TOKEN --config workers/wrangler.jsonc
    ```
 
-### Deploy a Separate API Worker
-
-Use this only when the frontend is hosted separately.
-
-1. Install dependencies with `pnpm install`.
-2. Run `pnpm exec wrangler secret put GITHUB_TOKEN --config workers/wrangler.jsonc` and paste the token created above.
-3. Change the Worker name in `workers/wrangler.jsonc` if needed.
-4. Deploy the API:
+3. Change the Worker name in `workers/wrangler.jsonc` if needed, then deploy:
 
    ```bash
    pnpm deploy:api
    ```
 
-5. Copy `.env.example` to `.env`, set `VITE_GITHUB_USERNAME` and the other site fields, then set `VITE_GITHUB_API` to the deployed Worker URL.
-6. Run `pnpm build` and upload `dist/` to your static host.
+4. Set `VITE_GITHUB_API` in `.env` to the deployed Worker URL, then run `pnpm build` again.
 
 Use `.dev.vars` and `workers/.dev.vars` only for local `wrangler dev` testing. Do not commit them.
 
@@ -99,8 +104,6 @@ pnpm build
 # Preview the production build
 pnpm preview
 ```
-
-The static output is written to `dist/` and can be deployed to any static hosting provider.
 
 ## Configure the Site
 
@@ -123,8 +126,8 @@ VITE_SITE_LOGO="/images/icon/favicon.ico"
 VITE_SITE_MAIN_LOGO="/images/icon/logo.png"
 VITE_SITE_APPLE_LOGO="/images/icon/apple-touch-icon.png"
 
-# GitHub data API; the code has a default when it is omitted
-VITE_GITHUB_API="https://gh-api.inp.la/"
+# GitHub data API; leave empty to use the public GitHub API Worker
+VITE_GITHUB_API=""
 
 # ICP registration; leave empty to hide it
 VITE_SITE_ICP=""
@@ -157,7 +160,7 @@ Edit `src/assets/siteLinks.json` to add projects. The page fetches GitHub pinned
 }
 ```
 
-`icon` may be one of `Github`, `Blog`, `Cloud`, `CompactDisc`, `Compass`, `Book`, `Fire`, or `LaptopCode`. It can also be an image URL, a `data:` URL, or an image path under `public/`.
+`icon` may be one of `Github`, `Blog`, `Cloud`, `CompactDisc`, `Compass`, `Book`, `Fire`, or `LaptopCode`. You can also select an icon from [xicons](https://www.xicons.org/), import it in `src/components/Links.vue`, and add it to the `siteIcon` mapping. Image URLs, `data:` URLs, and image paths under `public/` are also supported.
 
 ### Wallpapers and Icons
 

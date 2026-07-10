@@ -29,15 +29,6 @@
 
 ## 部署
 
-### 获取 GitHub Token
-
-Worker 使用它请求 GitHub GraphQL 数据，Token 不会暴露给浏览器。
-
-1. 打开 [GitHub Token 设置页](https://github.com/settings/personal-access-tokens/new)。
-2. 创建 **fine-grained personal access token**，设置有效期，并将资源所有者选择为自己的账号。
-3. 仓库访问范围选择 **Public Repositories (read-only)**。读取公开置顶仓库和贡献数据不需要额外权限。
-4. 生成后立即复制 Token；GitHub 不会再次显示完整内容。
-
 ### Cloudflare 一体化部署
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/INP146/HomePage)
@@ -46,7 +37,7 @@ Worker 使用它请求 GitHub GraphQL 数据，Token 不会暴露给浏览器。
 
 1. 点击徽章。
 2. 登录 Cloudflare，并连接 GitHub 或 GitLab。
-3. 按提示填写 Worker 名称、上一步创建的 Token，以及以下公开站点字段：
+3. 按提示填写 Worker 名称、[GitHub Token](https://github.com/settings/personal-access-tokens/new)（选择 **fine-grained personal access token** 和 **Public Repositories (read-only)**），以及以下公开站点字段：
    - `VITE_GITHUB_USERNAME`
    - `VITE_SITE_AUTHOR`
    - `VITE_SITE_KEYWORDS`
@@ -54,35 +45,49 @@ Worker 使用它请求 GitHub GraphQL 数据，Token 不会暴露给浏览器。
    - 如需配置备案或社交链接，请在表单的“高级设置”中按需添加以下公开变量：`VITE_SITE_ICP`、`VITE_SOCIAL_EMAIL`、`VITE_SOCIAL_TWITTER`、`VITE_SOCIAL_TELEGRAM`、`VITE_SOCIAL_QQ`、`VITE_SOCIAL_BILIBILI`。
 4. 完成部署。
 
-如需从本地仓库部署：
+### 自行部署
 
-1. 执行 `pnpm install`。
-2. 执行 `pnpm exec wrangler secret put GITHUB_TOKEN --config wrangler.jsonc`，并粘贴上一步创建的 Token。
-3. 按需修改 `wrangler.jsonc` 中的 Worker 名称，再执行：
+将 `.env.example` 复制为 `.env`，至少填写 GitHub 用户名；其余站点字段可按需修改：
+
+```dotenv
+VITE_GITHUB_USERNAME="your-github-username"
+# 留空时使用公共 GitHub API Worker
+VITE_GITHUB_API=""
+```
+
+安装依赖并构建：
+
+```bash
+pnpm install
+pnpm build
+```
+
+构建产物位于 `dist/`，将其上传至任意静态站点托管服务即可。
+
+默认使用公共 GitHub API Worker。若需使用自己的 GitHub Token 或 API Worker，请继续按以下步骤部署。
+
+### 部署自己的 API Worker
+
+Worker 使用 GitHub Token 请求 GraphQL 数据，Token 不会暴露给浏览器。
+
+1. 打开 [GitHub Token 设置页](https://github.com/settings/personal-access-tokens/new)，创建 **fine-grained personal access token**；仓库访问范围选择 **Public Repositories (read-only)**。
+2. 执行以下命令并粘贴 Token：
 
    ```bash
-   pnpm deploy:cloudflare
+   pnpm exec wrangler secret put GITHUB_TOKEN --config workers/wrangler.jsonc
    ```
 
-### 单独部署 API Worker
-
-仅在前端需要单独托管时使用此路线。
-
-1. 执行 `pnpm install`。
-2. 执行 `pnpm exec wrangler secret put GITHUB_TOKEN --config workers/wrangler.jsonc`，并粘贴上一步创建的 Token。
-3. 按需修改 `workers/wrangler.jsonc` 中的 Worker 名称。
-4. 部署 API：
+3. 按需修改 `workers/wrangler.jsonc` 中的 Worker 名称，再部署：
 
    ```bash
    pnpm deploy:api
    ```
 
-5. 将 `.env.example` 复制为 `.env`，填写 `VITE_GITHUB_USERNAME` 和其他站点字段，再将部署得到的 Worker URL 写入 `VITE_GITHUB_API`。
-6. 执行 `pnpm build`，再将 `dist/` 上传至静态托管服务。
+4. 将部署得到的 Worker URL 写入 `.env` 的 `VITE_GITHUB_API`，然后重新执行 `pnpm build`。
 
 `.dev.vars` 与 `workers/.dev.vars` 仅用于本地 `wrangler dev` 测试，不要提交它们。
 
-## 本地运行
+## 本地开发
 
 建议使用 Node.js 18 或更高版本。
 
@@ -99,8 +104,6 @@ pnpm build
 # 本地预览生产构建
 pnpm preview
 ```
-
-构建产物位于 `dist/`，可直接部署到任意静态站点托管服务。
 
 ## 配置站点
 
@@ -123,8 +126,8 @@ VITE_SITE_LOGO="/images/icon/favicon.ico"
 VITE_SITE_MAIN_LOGO="/images/icon/logo.png"
 VITE_SITE_APPLE_LOGO="/images/icon/apple-touch-icon.png"
 
-# GitHub 数据服务地址；不配置时使用代码中的默认地址
-VITE_GITHUB_API="https://gh-api.inp.la/"
+# GitHub 数据服务地址；留空时使用公共 GitHub API Worker
+VITE_GITHUB_API=""
 
 # ICP 备案号；留空则不显示
 VITE_SITE_ICP=""
@@ -157,7 +160,7 @@ GitHub、邮箱、Twitter、Telegram、QQ、Bilibili 链接均会根据上述环
 }
 ```
 
-`icon` 可以是 `Github`、`Blog`、`Cloud`、`CompactDisc`、`Compass`、`Book`、`Fire` 或 `LaptopCode`，也可以是图片 URL、`data:` URL 或 `public/` 下的图片路径。
+`icon` 可以是 `Github`、`Blog`、`Cloud`、`CompactDisc`、`Compass`、`Book`、`Fire` 或 `LaptopCode`。也可从 [xicons](https://www.xicons.org/) 选择图标，并在 `src/components/Links.vue` 中自行导入、加入 `siteIcon` 映射；或者使用图片 URL、`data:` URL 或 `public/` 下的图片路径。
 
 ### 壁纸与图标
 
