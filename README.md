@@ -51,6 +51,7 @@ The button is the shortest route:
    - `VITE_SITE_AUTHOR`
    - `VITE_SITE_KEYWORDS`
    - `VITE_SITE_NAME`
+   - To configure an ICP record or social links, add these public variables as needed under the form's **Advanced settings**: `VITE_SITE_ICP`, `VITE_SOCIAL_EMAIL`, `VITE_SOCIAL_TWITTER`, `VITE_SOCIAL_TELEGRAM`, `VITE_SOCIAL_QQ`, and `VITE_SOCIAL_BILIBILI`.
 4. Deploy.
 
 To deploy from your local checkout instead:

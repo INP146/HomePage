@@ -51,6 +51,7 @@ Worker 使用它请求 GitHub GraphQL 数据，Token 不会暴露给浏览器。
    - `VITE_SITE_AUTHOR`
    - `VITE_SITE_KEYWORDS`
    - `VITE_SITE_NAME`
+   - 如需配置备案或社交链接，请在表单的“高级设置”中按需添加以下公开变量：`VITE_SITE_ICP`、`VITE_SOCIAL_EMAIL`、`VITE_SOCIAL_TWITTER`、`VITE_SOCIAL_TELEGRAM`、`VITE_SOCIAL_QQ`、`VITE_SOCIAL_BILIBILI`。
 4. 完成部署。
 
 如需从本地仓库部署：
