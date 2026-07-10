@@ -29,42 +29,59 @@
 
 ## 部署
 
-共享的 Worker 实现在 `workers/github-api.ts`。它接受 `type=pinned` 或 `type=contributions`、`username` 和可选的 `limit` 参数。
+### 获取 GitHub Token
+
+Worker 使用它请求 GitHub GraphQL 数据，Token 不会暴露给浏览器。
+
+1. 打开 [GitHub Token 设置页](https://github.com/settings/personal-access-tokens/new)。
+2. 创建 **fine-grained personal access token**，设置有效期，并将资源所有者选择为自己的账号。
+3. 仓库访问范围选择 **Public Repositories (read-only)**。读取公开置顶仓库和贡献数据不需要额外权限。
+4. 生成后立即复制 Token；GitHub 不会再次显示完整内容。
 
 ### Cloudflare 一体化部署
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/INP146/HomePage)
 
-一体化路线会将 Vite 的 `dist/` 上传为 Workers Static Assets，并在同源 `/api/github` 处理 GitHub API。
+徽章是一键部署入口：
 
-1. 根据 `.dev.vars.example` 创建 `.dev.vars`，并填写 `GITHUB_TOKEN`。
-2. 按需修改 `wrangler.jsonc` 中的 Worker 名称。
-3. 一次性部署静态资源与 Worker：
+1. 点击徽章。
+2. 登录 Cloudflare，并连接 GitHub 或 GitLab。
+3. 按提示填写 Worker 名称、上一步创建的 Token，以及以下公开站点字段：
+   - `VITE_GITHUB_USERNAME`
+   - `VITE_SITE_AUTHOR`
+   - `VITE_SITE_KEYWORDS`
+   - `VITE_SITE_URL`
+   - `VITE_SITE_ICP`
+   - `VITE_SOCIAL_EMAIL`、`VITE_SOCIAL_TWITTER`、`VITE_SOCIAL_TELEGRAM`、`VITE_SOCIAL_QQ`、`VITE_SOCIAL_BILIBILI`
+4. 完成部署。
+
+如需从本地仓库部署：
+
+1. 执行 `pnpm install`。
+2. 执行 `pnpm exec wrangler secret put GITHUB_TOKEN --config wrangler.jsonc`，并粘贴上一步创建的 Token。
+3. 按需修改 `wrangler.jsonc` 中的 Worker 名称，再执行：
 
    ```bash
    pnpm deploy:cloudflare
    ```
 
-Cloudflare 构建模式会读取 `.env.cloudflare`，使浏览器请求 `/api/github`。静态资源请求不会执行 Worker，只有 `/api/*` 消耗 Workers 请求额度。
-
-Deploy to Cloudflare 徽章使用此一体化路线。仓库须公开在 GitHub 或 GitLab，部署者需要提供自己的 `GITHUB_TOKEN`。
-
 ### 单独部署 API Worker
 
-该路线保留前端为标准 `dist/` 产物，适用于 Docker、Nginx、Pages 或任意静态托管服务。
+仅在前端需要单独托管时使用此路线。
 
-1. 根据 `workers/.dev.vars.example` 创建 `workers/.dev.vars`，并填写 `GITHUB_TOKEN`。
-2. 按需修改 `workers/wrangler.jsonc` 中的 Worker 名称，再执行部署：
+1. 执行 `pnpm install`。
+2. 执行 `pnpm exec wrangler secret put GITHUB_TOKEN --config workers/wrangler.jsonc`，并粘贴上一步创建的 Token。
+3. 按需修改 `workers/wrangler.jsonc` 中的 Worker 名称。
+4. 部署 API：
 
    ```bash
    pnpm deploy:api
    ```
 
-3. 将部署得到的 Worker URL 写入 `VITE_GITHUB_API`，执行 `pnpm build` 后按常规方式部署 `dist/`。
+5. 将 `.env.example` 复制为 `.env`，填写 `VITE_GITHUB_USERNAME` 和其他站点字段，再将部署得到的 Worker URL 写入 `VITE_GITHUB_API`。
+6. 执行 `pnpm build`，再将 `dist/` 上传至静态托管服务。
 
-由于前端每次请求都会携带 GitHub 用户名，`GITHUB_USERNAME` 是可选的；单独使用 API 时可将其配置为 Worker 变量。
-
-浏览器端不应配置或暴露 `GITHUB_TOKEN`。GitHub 公开动态和公开贡献回退源可能受 API 可用性、网络和速率限制影响。
+`.dev.vars` 与 `workers/.dev.vars` 仅用于本地 `wrangler dev` 测试，不要提交它们。
 
 ## 本地运行
 
@@ -88,7 +105,7 @@ pnpm preview
 
 ## 配置站点
 
-项目直接读取根目录的 `.env`。修改后需要重启开发服务器或重新构建。
+本地开发或单独托管前端时，先将 `.env.example` 复制为 `.env`。修改后需要重启开发服务器或重新构建。
 
 ```dotenv
 # 站点基本信息
@@ -96,6 +113,14 @@ VITE_SITE_NAME="HomePage"
 VITE_SITE_AUTHOR="INP146"
 VITE_SITE_KEYWORDS="INP146,INP"
 VITE_SITE_URL="inp.la"
+VITE_GITHUB_USERNAME="INP146"
+
+# 固定社交链接：邮箱地址、Twitter/Telegram 用户名、QQ 号、Bilibili 用户 ID
+VITE_SOCIAL_EMAIL=""
+VITE_SOCIAL_TWITTER=""
+VITE_SOCIAL_TELEGRAM=""
+VITE_SOCIAL_QQ=""
+VITE_SOCIAL_BILIBILI=""
 VITE_SITE_LOGO="/images/icon/favicon.ico"
 VITE_SITE_MAIN_LOGO="/images/icon/logo.png"
 VITE_SITE_APPLE_LOGO="/images/icon/apple-touch-icon.png"
@@ -107,11 +132,11 @@ VITE_GITHUB_API="https://gh-api.inp.la/"
 VITE_SITE_ICP=""
 ```
 
-GitHub 用户名优先从 `src/assets/socialLinks.json` 中名称为 `Github` 的链接解析；未配置时回退到 `VITE_SITE_AUTHOR`。
+GitHub 主页、公开动态、贡献图和 GitHub 社交链接均使用 `VITE_GITHUB_USERNAME`。
 
 ### 社交链接
 
-编辑 `src/assets/socialLinks.json`。每一项包含显示名称、图标路径和跳转地址：
+GitHub、邮箱、Twitter、Telegram、QQ、Bilibili 链接均会根据上述环境变量自动生成。`src/assets/socialLinks.json` 仅用于添加其他社交链接：
 
 ```json
 {

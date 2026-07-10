@@ -29,6 +29,7 @@ import { ElMessage } from "element-plus";
 import { HamburgerButton, CloseSmall } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { getGithubContributions, getProjectLinks } from "@/api";
+import { loadRuntimeSiteConfig } from "@/config/site";
 import { Icon } from "@vicons/utils";
 import Loading from "@/components/Loading.vue";
 import MainLeft from "@/views/Main/Left.vue";
@@ -41,6 +42,7 @@ import config from "@/../package.json";
 const store = mainStore();
 
 const initProjectLinks = async () => {
+  await loadRuntimeSiteConfig();
   const [links, contributions] = await Promise.all([getProjectLinks(), getGithubContributions()]);
   store.setProjectLinks(links);
   store.setGithubContributions(contributions.total, contributions.contributions);

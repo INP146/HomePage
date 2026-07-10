@@ -39,16 +39,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, type Component } from "vue";
-import {
-  Branch,
-  Code,
-  FolderCode,
-  Fork,
-  History,
-  PullRequests,
-  Star,
-} from "@icon-park/vue-next";
-import socialLinks from "@/assets/socialLinks.json";
+import { Branch, Code, FolderCode, Fork, History, PullRequests, Star } from "@icon-park/vue-next";
+import { siteConfig } from "@/config/site";
 
 interface GithubEvent {
   id: string;
@@ -78,13 +70,7 @@ interface ActivityGroup {
   items: TimelineItem[];
 }
 
-const fallbackUser = import.meta.env.VITE_SITE_AUTHOR || "INP146";
-const githubLink = socialLinks.find((item) => item.name?.toLowerCase() === "github");
-const githubUser = computed(() => {
-  const url = githubLink?.url || "";
-  const match = url.match(/github\.com\/([^/?#]+)/i);
-  return match?.[1] || fallbackUser;
-});
+const githubUser = computed(() => siteConfig.githubUsername);
 
 const events = ref<GithubEvent[]>([]);
 const isLoading = ref(true);
@@ -189,7 +175,9 @@ const activityGroups = computed(() => {
 const loadActivity = async (): Promise<void> => {
   isLoading.value = true;
   try {
-    const response = await fetch(`https://api.github.com/users/${githubUser.value}/events/public?per_page=12`);
+    const response = await fetch(
+      `https://api.github.com/users/${githubUser.value}/events/public?per_page=12`,
+    );
     if (response.ok) {
       const data: unknown = await response.json();
       events.value = Array.isArray(data) ? (data as GithubEvent[]) : [];

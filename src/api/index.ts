@@ -1,11 +1,6 @@
 import siteLinks from "@/assets/siteLinks.json";
-import socialLinks from "@/assets/socialLinks.json";
-import type {
-  GithubContribution,
-  GithubContributionsResponse,
-  ProjectLink,
-  SocialLink,
-} from "@/types";
+import { siteConfig } from "@/config/site";
+import type { GithubContribution, GithubContributionsResponse, ProjectLink } from "@/types";
 
 interface GithubPinnedRepository {
   author?: string;
@@ -22,15 +17,7 @@ interface GithubContributionsPayload {
 }
 
 const githubApi = import.meta.env.VITE_GITHUB_API || "https://gh-pinned-repo.inp.la/";
-const fallbackUser = import.meta.env.VITE_SITE_AUTHOR || "INP146";
-
-export const getGithubUser = (): string => {
-  const githubLink = (socialLinks as SocialLink[]).find(
-    (item) => item.name.toLowerCase() === "github",
-  );
-  const match = githubLink?.url.match(/github\.com\/([^/?#]+)/i);
-  return match?.[1] || fallbackUser;
-};
+export const getGithubUser = (): string => siteConfig.githubUsername;
 
 const getGithubApiUrl = (
   type: "pinned" | "contributions",

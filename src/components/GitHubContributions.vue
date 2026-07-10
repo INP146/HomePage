@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
 import { mainStore } from "@/store";
-import socialLinks from "@/assets/socialLinks.json";
+import { siteConfig } from "@/config/site";
 import type { GithubContribution } from "@/types";
 
 interface CalendarDay extends GithubContribution {}
@@ -67,14 +67,8 @@ interface MonthLabel {
 }
 
 const store = mainStore();
-const fallbackUser = import.meta.env.VITE_SITE_AUTHOR || "INP146";
-const githubLink = socialLinks.find((item) => item.name?.toLowerCase() === "github");
-const githubUser = computed(() => {
-  const url = githubLink?.url || "";
-  const match = url.match(/github\.com\/([^/?#]+)/i);
-  return match?.[1] || fallbackUser;
-});
-const profileUrl = computed(() => githubLink?.url || `https://github.com/${githubUser.value}`);
+const githubUser = computed(() => siteConfig.githubUsername);
+const profileUrl = computed(() => `https://github.com/${githubUser.value}`);
 
 const levels = [0, 1, 2, 3, 4];
 const monthFormatter = new Intl.DateTimeFormat("en", { month: "short" });

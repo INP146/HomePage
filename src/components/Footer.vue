@@ -16,14 +16,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
+import { siteConfig } from "@/config/site";
 const fullYear = new Date().getFullYear();
 
-// 加载配置数据
-const siteIcp = ref(import.meta.env.VITE_SITE_ICP);
-const siteAuthor = ref(import.meta.env.VITE_SITE_AUTHOR);
+const siteIcp = computed(() => siteConfig.icp);
+const siteAuthor = computed(() => siteConfig.author);
 const siteUrl = computed(() => {
-  const url = import.meta.env.VITE_SITE_URL;
+  const url = siteConfig.url;
   if (!url) return siteAuthor.value ? `https://github.com/${siteAuthor.value}` : "/";
   // 判断协议前缀
   if (!url.startsWith("http://") && !url.startsWith("https://")) {

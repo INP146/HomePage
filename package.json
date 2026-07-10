@@ -3,6 +3,43 @@
   "author": "INP146",
   "github": "https://github.com/INP146/HomePage",
   "homepage": "https://inp.la",
+  "cloudflare": {
+    "bindings": {
+      "GITHUB_TOKEN": {
+        "description": "GitHub GraphQL token. Create one from GitHub Settings > Developer settings > Personal access tokens."
+      },
+      "VITE_GITHUB_USERNAME": {
+        "description": "GitHub username shown in the profile, activity feed, and contribution graph."
+      },
+      "VITE_SITE_AUTHOR": {
+        "description": "Name shown in the footer copyright notice."
+      },
+      "VITE_SITE_KEYWORDS": {
+        "description": "Comma-separated keywords for the page metadata."
+      },
+      "VITE_SITE_URL": {
+        "description": "Public site URL, including https://."
+      },
+      "VITE_SITE_ICP": {
+        "description": "ICP filing number. Leave empty when it does not apply."
+      },
+      "VITE_SOCIAL_EMAIL": {
+        "description": "Email address used for the Email social link."
+      },
+      "VITE_SOCIAL_TWITTER": {
+        "description": "Twitter username without @. Leave empty to hide the link."
+      },
+      "VITE_SOCIAL_TELEGRAM": {
+        "description": "Telegram username without @. Leave empty to hide the link."
+      },
+      "VITE_SOCIAL_QQ": {
+        "description": "QQ number. Leave empty to hide the link."
+      },
+      "VITE_SOCIAL_BILIBILI": {
+        "description": "Bilibili user ID. Leave empty to hide the link."
+      }
+    }
+  },
   "private": true,
   "version": "4.1.4",
   "type": "module",

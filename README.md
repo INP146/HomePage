@@ -29,42 +29,59 @@ A developer-focused personal homepage built with Vue 3. It brings together proje
 
 ## Deployment
 
-The shared Worker implementation is at `workers/github-api.ts`. It accepts `type=pinned` or `type=contributions`, `username`, and an optional `limit`.
+### Create a GitHub Token
+
+The Worker uses this token to request GitHub GraphQL data; it is never exposed to the browser.
+
+1. Open [GitHub token settings](https://github.com/settings/personal-access-tokens/new).
+2. Create a **fine-grained personal access token**, choose an expiration date, and set the resource owner to your account.
+3. Select **Public Repositories (read-only)**. No additional permissions are required for public pinned repositories and contribution data.
+4. Generate and copy the token immediately. GitHub will not show it again.
 
 ### Deploy a Full Cloudflare Worker
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/INP146/HomePage)
 
-The full Cloudflare route uploads the Vite `dist/` output as Workers Static Assets and handles the API at the same-origin `/api/github` route.
+The button is the shortest route:
 
-1. Create `.dev.vars` from `.dev.vars.example` and set `GITHUB_TOKEN`.
-2. Change the Worker name in `wrangler.jsonc` if needed.
-3. Deploy the assets and Worker together:
+1. Click the button.
+2. Sign in to Cloudflare and connect GitHub or GitLab.
+3. Fill in the Worker name, the token created above, and these public site fields:
+   - `VITE_GITHUB_USERNAME`
+   - `VITE_SITE_AUTHOR`
+   - `VITE_SITE_KEYWORDS`
+   - `VITE_SITE_URL`
+   - `VITE_SITE_ICP`
+   - `VITE_SOCIAL_EMAIL`, `VITE_SOCIAL_TWITTER`, `VITE_SOCIAL_TELEGRAM`, `VITE_SOCIAL_QQ`, `VITE_SOCIAL_BILIBILI`
+4. Deploy.
+
+To deploy from your local checkout instead:
+
+1. Install dependencies with `pnpm install`.
+2. Run `pnpm exec wrangler secret put GITHUB_TOKEN --config wrangler.jsonc` and paste the token created above.
+3. Change the Worker name in `wrangler.jsonc` if needed, then run:
 
    ```bash
    pnpm deploy:cloudflare
    ```
 
-The Cloudflare build mode reads `.env.cloudflare`, so the browser uses `/api/github`. Static asset requests do not invoke the Worker; only `/api/*` consumes Workers request quota.
-
-The Deploy to Cloudflare button uses this full Worker route. It requires a public GitHub or GitLab repository and prompts deployers to provide their own `GITHUB_TOKEN`.
-
 ### Deploy a Separate API Worker
 
-This route keeps the frontend as a standard `dist/` deployment and is suitable for Docker, Nginx, Pages, or any other static host.
+Use this only when the frontend is hosted separately.
 
-1. Create `workers/.dev.vars` from `workers/.dev.vars.example` and set `GITHUB_TOKEN`.
-2. Change the Worker name in `workers/wrangler.jsonc` if needed, then deploy it:
+1. Install dependencies with `pnpm install`.
+2. Run `pnpm exec wrangler secret put GITHUB_TOKEN --config workers/wrangler.jsonc` and paste the token created above.
+3. Change the Worker name in `workers/wrangler.jsonc` if needed.
+4. Deploy the API:
 
    ```bash
    pnpm deploy:api
    ```
 
-3. Set the deployed Worker URL in `VITE_GITHUB_API`, then run `pnpm build` and deploy `dist/` normally.
+5. Copy `.env.example` to `.env`, set `VITE_GITHUB_USERNAME` and the other site fields, then set `VITE_GITHUB_API` to the deployed Worker URL.
+6. Run `pnpm build` and upload `dist/` to your static host.
 
-`GITHUB_USERNAME` is optional because the frontend sends the GitHub username with each request. It can be configured as a Worker variable when using the API independently.
-
-Never expose `GITHUB_TOKEN` to the browser. Public GitHub activity and the contribution fallback can be affected by API availability, networking, and rate limits.
+Use `.dev.vars` and `workers/.dev.vars` only for local `wrangler dev` testing. Do not commit them.
 
 ## Run Locally
 
@@ -88,7 +105,7 @@ The static output is written to `dist/` and can be deployed to any static hostin
 
 ## Configure the Site
 
-The application reads configuration from the root `.env` file. Restart the development server or rebuild after changing it.
+For local development or a separately hosted frontend, copy `.env.example` to `.env`. Restart the development server or rebuild after changing it.
 
 ```dotenv
 # Site information
@@ -96,6 +113,14 @@ VITE_SITE_NAME="HomePage"
 VITE_SITE_AUTHOR="INP146"
 VITE_SITE_KEYWORDS="INP146,INP"
 VITE_SITE_URL="inp.la"
+VITE_GITHUB_USERNAME="INP146"
+
+# Core social links: email address, Twitter/Telegram usernames, QQ number, and Bilibili user ID
+VITE_SOCIAL_EMAIL=""
+VITE_SOCIAL_TWITTER=""
+VITE_SOCIAL_TELEGRAM=""
+VITE_SOCIAL_QQ=""
+VITE_SOCIAL_BILIBILI=""
 VITE_SITE_LOGO="/images/icon/favicon.ico"
 VITE_SITE_MAIN_LOGO="/images/icon/logo.png"
 VITE_SITE_APPLE_LOGO="/images/icon/apple-touch-icon.png"
@@ -107,11 +132,11 @@ VITE_GITHUB_API="https://gh-api.inp.la/"
 VITE_SITE_ICP=""
 ```
 
-The GitHub username is first resolved from the `Github` entry in `src/assets/socialLinks.json`, then falls back to `VITE_SITE_AUTHOR`.
+GitHub profile, activity, contributions, and the GitHub social link all use `VITE_GITHUB_USERNAME`.
 
 ### Social Links
 
-Edit `src/assets/socialLinks.json`. Each entry has a label, icon path, and URL:
+GitHub, Email, Twitter, Telegram, QQ, and Bilibili links are generated from the environment variables above. Use `src/assets/socialLinks.json` only for additional social links:
 
 ```json
 {
