@@ -23,7 +23,9 @@
     </main>
   </Transition>
 </template>
-<script setup>
+<script setup lang="ts">
+import { onBeforeUnmount, onMounted } from "vue";
+import { ElMessage } from "element-plus";
 import { HamburgerButton, CloseSmall } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
 import { getGithubContributions, getProjectLinks } from "@/api";
@@ -33,7 +35,7 @@ import MainLeft from "@/views/Main/Left.vue";
 import MainRight from "@/views/Main/Right.vue";
 import Background from "@/components/Background.vue";
 import Footer from "@/components/Footer.vue";
-import cursorInit from "@/utils/cursor.js";
+import cursorInit from "@/utils/cursor";
 import config from "@/../package.json";
 
 const store = mainStore();

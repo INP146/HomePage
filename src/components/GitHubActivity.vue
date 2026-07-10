@@ -37,7 +37,8 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { computed, onMounted, ref, type Component } from "vue";
 import {
   Branch,
   Code,
@@ -49,6 +50,34 @@ import {
 } from "@icon-park/vue-next";
 import socialLinks from "@/assets/socialLinks.json";
 
+interface GithubEvent {
+  id: string;
+  type?: string;
+  created_at: string;
+  repo?: { name?: string };
+  payload?: { action?: string; commits?: unknown[]; ref_type?: string };
+}
+
+interface ActivityDescription {
+  title: string;
+  detail: string;
+  icon: Component;
+  repo: string;
+  level?: number;
+}
+
+interface TimelineItem extends ActivityDescription {
+  id: string;
+  repoUrl: string;
+  month: string;
+  dateLabel: string;
+}
+
+interface ActivityGroup {
+  month: string;
+  items: TimelineItem[];
+}
+
 const fallbackUser = import.meta.env.VITE_SITE_AUTHOR || "INP146";
 const githubLink = socialLinks.find((item) => item.name?.toLowerCase() === "github");
 const githubUser = computed(() => {
@@ -57,14 +86,14 @@ const githubUser = computed(() => {
   return match?.[1] || fallbackUser;
 });
 
-const events = ref([]);
+const events = ref<GithubEvent[]>([]);
 const isLoading = ref(true);
 const monthFormatter = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" });
 const dayFormatter = new Intl.DateTimeFormat("en", { month: "short", day: "numeric" });
 
-const repoUrl = (repo) => `https://github.com/${repo}`;
+const repoUrl = (repo: string): string => `https://github.com/${repo}`;
 
-const describeCreateEvent = (event) => {
+const describeCreateEvent = (event: GithubEvent): Pick<ActivityDescription, "title" | "icon"> => {
   const type = event.payload?.ref_type;
   if (type === "repository") return { title: "Created 1 repository", icon: FolderCode };
   if (type === "branch") return { title: "Created 1 branch", icon: Branch };
@@ -72,7 +101,7 @@ const describeCreateEvent = (event) => {
   return { title: "Created 1 item", icon: FolderCode };
 };
 
-const describeEvent = (event) => {
+const describeEvent = (event: GithubEvent): ActivityDescription => {
   const repo = event.repo?.name || `${githubUser.value}/GitHub`;
   const commits = event.payload?.commits?.length || 0;
 
@@ -145,7 +174,7 @@ const timelineItems = computed(() =>
 );
 
 const activityGroups = computed(() => {
-  const groups = [];
+  const groups: ActivityGroup[] = [];
   timelineItems.value.forEach((item) => {
     const group = groups.find((entry) => entry.month === item.month);
     if (group) {
@@ -157,12 +186,13 @@ const activityGroups = computed(() => {
   return groups;
 });
 
-const loadActivity = async () => {
+const loadActivity = async (): Promise<void> => {
   isLoading.value = true;
   try {
     const response = await fetch(`https://api.github.com/users/${githubUser.value}/events/public?per_page=12`);
     if (response.ok) {
-      events.value = await response.json();
+      const data: unknown = await response.json();
+      events.value = Array.isArray(data) ? (data as GithubEvent[]) : [];
     }
   } catch (error) {
     console.warn("GitHub activity load failed", error);

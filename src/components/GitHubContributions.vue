@@ -52,9 +52,19 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { computed, nextTick, ref, watch } from "vue";
 import { mainStore } from "@/store";
 import socialLinks from "@/assets/socialLinks.json";
+import type { GithubContribution } from "@/types";
+
+interface CalendarDay extends GithubContribution {}
+
+interface MonthLabel {
+  label: string;
+  column: number;
+  span: number;
+}
 
 const store = mainStore();
 const fallbackUser = import.meta.env.VITE_SITE_AUTHOR || "INP146";
@@ -71,10 +81,10 @@ const monthFormatter = new Intl.DateTimeFormat("en", { month: "short" });
 const total = computed(() => store.githubContributionsTotal);
 const contributions = computed(() => store.githubContributions);
 const isLoading = computed(() => !store.githubLoadStatus);
-const calendarWrap = ref(null);
+const calendarWrap = ref<HTMLDivElement | null>(null);
 
-const createEmptyYear = () => {
-  const days = [];
+const createEmptyYear = (): CalendarDay[] => {
+  const days: CalendarDay[] = [];
   const today = new Date();
   const start = new Date(today);
   start.setDate(today.getDate() - 365);
@@ -124,7 +134,7 @@ const monthGridStyle = computed(() => ({
 }));
 
 const monthLabels = computed(() => {
-  const labels = [];
+  const labels: MonthLabel[] = [];
   let previousMonth = "";
 
   for (let weekIndex = 0; weekIndex < weekCount.value; weekIndex += 1) {
@@ -154,11 +164,11 @@ const totalText = computed(() => {
   return `${total.value} contributions in the last year`;
 });
 
-const openGitHub = () => {
+const openGitHub = (): void => {
   window.open(profileUrl.value, "_blank");
 };
 
-const scrollToLatest = () => {
+const scrollToLatest = (): void => {
   nextTick(() => {
     if (!calendarWrap.value) return;
     calendarWrap.value.scrollLeft = calendarWrap.value.scrollWidth;

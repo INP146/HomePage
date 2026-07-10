@@ -8,9 +8,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p workers/tsconfig.json && vite build",
+    "build:cloudflare": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p workers/tsconfig.json && vite build --mode cloudflare",
+    "deploy": "pnpm deploy:cloudflare",
+    "deploy:api": "wrangler deploy --config workers/wrangler.jsonc",
+    "deploy:cloudflare": "pnpm build:cloudflare && wrangler deploy --config wrangler.jsonc",
     "preview": "vite preview",
     "format": "prettier --write src/",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p workers/tsconfig.json",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix"
   },
   "dependencies": {
@@ -21,7 +26,9 @@
     "vue": "^3.4.21"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260708.1",
     "@icon-park/vue-next": "^1.4.2",
+    "@types/node": "^20.19.43",
     "@vicons/fa": "^0.12.0",
     "@vicons/utils": "^0.1.4",
     "@vitejs/plugin-vue": "^4.6.2",
@@ -30,10 +37,13 @@
     "prettier": "^3.2.5",
     "sass": "^1.71.1",
     "terser": "^5.29.1",
+    "typescript": "^5.9.3",
     "unplugin-auto-import": "^0.11.5",
     "unplugin-vue-components": "^0.22.12",
     "vite": "^4.5.2",
     "vite-plugin-compression": "^0.5.1",
-    "vite-plugin-pwa": "^0.14.7"
+    "vite-plugin-pwa": "^0.14.7",
+    "vue-tsc": "^2.2.12",
+    "wrangler": "^4.107.1"
   }
 }

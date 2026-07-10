@@ -9,7 +9,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { mainStore } from "@/store";
 import Link from "@/components/Links.vue";
 import GitHubActivity from "@/components/GitHubActivity.vue";

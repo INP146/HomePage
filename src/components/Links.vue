@@ -16,7 +16,7 @@
       @swiper="setSwiper"
       @slide-change="setActiveSlide"
     >
-      <SwiperSlide v-for="site in siteLinksList" :key="site">
+      <SwiperSlide v-for="(site, slideIndex) in siteLinksList" :key="slideIndex">
         <el-row class="link-all" :gutter="20">
           <el-col v-for="(item, index) in site" :span="12" :key="item">
             <div
@@ -60,7 +60,8 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { computed, ref, type Component } from "vue";
 import { Icon } from "@vicons/utils";
 // 可前往 https://www.xicons.org 自行挑选并在此处引入
 import {
@@ -75,17 +76,18 @@ import {
   LaptopCode,
 } from "@vicons/fa"; // 注意使用正确的类别
 import { Swiper, SwiperSlide } from "swiper/vue";
-import { Mousewheel } from "swiper";
+import { Mousewheel, type Swiper as SwiperInstance } from "swiper";
 import { mainStore } from "@/store";
+import type { ProjectLink } from "@/types";
 
 const store = mainStore();
 const projectLinks = computed(() => store.projectLinks);
-const swiperRef = ref(null);
+const swiperRef = ref<SwiperInstance | null>(null);
 const activeSlide = ref(0);
 
 // 计算网站链接
 const siteLinksList = computed(() => {
-  const result = [];
+  const result: ProjectLink[][] = [];
   for (let i = 0; i < projectLinks.value.length; i += 4) {
     const subArr = projectLinks.value.slice(i, i + 4);
     result.push(subArr);
@@ -94,7 +96,7 @@ const siteLinksList = computed(() => {
 });
 
 // 网站链接图标
-const siteIcon = {
+const siteIcon: Record<string, Component> = {
   Github,
   Blog,
   Cloud,
@@ -108,34 +110,32 @@ const siteIcon = {
 const imageIconPattern =
   /^(https?:)?\/\/|^(data|blob):|^\.{0,2}\/|^\w+\/|.*\.(png|jpe?g|webp|gif|svg|ico)(\?.*)?$/i;
 
-const isImageIcon = (icon) => {
-  return typeof icon === "string" && imageIconPattern.test(icon);
-};
+const isImageIcon = (icon: string): boolean => imageIconPattern.test(icon);
 
-const formatImageIcon = (icon) => {
+const formatImageIcon = (icon: string): string => {
   if (/^(https?:)?\/\/|^(data|blob):|^\.{0,2}\//i.test(icon)) return icon;
   return icon.startsWith("/") ? icon : `/${icon}`;
 };
 
-const getSiteIcon = (icon) => {
+const getSiteIcon = (icon: string): Component => {
   return siteIcon[icon] || Github;
 };
 
-const setSwiper = (swiper) => {
+const setSwiper = (swiper: SwiperInstance): void => {
   swiperRef.value = swiper;
 };
 
-const setActiveSlide = (swiper) => {
+const setActiveSlide = (swiper: SwiperInstance): void => {
   activeSlide.value = swiper.activeIndex;
 };
 
-const goToSlide = (index) => {
+const goToSlide = (index: number): void => {
   swiperRef.value?.slideTo(index);
   activeSlide.value = index;
 };
 
 // 链接跳转
-const jumpLink = (data) => {
+const jumpLink = (data: ProjectLink): void => {
   window.open(data.link, "_blank");
 };
 </script>

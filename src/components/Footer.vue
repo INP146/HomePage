@@ -15,7 +15,8 @@
   </footer>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { computed, ref } from "vue";
 const fullYear = new Date().getFullYear();
 
 // 加载配置数据
@@ -23,7 +24,7 @@ const siteIcp = ref(import.meta.env.VITE_SITE_ICP);
 const siteAuthor = ref(import.meta.env.VITE_SITE_AUTHOR);
 const siteUrl = computed(() => {
   const url = import.meta.env.VITE_SITE_URL;
-  if (!url) return "https://www.imsyy.top";
+  if (!url) return siteAuthor.value ? `https://github.com/${siteAuthor.value}` : "/";
   // 判断协议前缀
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
     return "//" + url;

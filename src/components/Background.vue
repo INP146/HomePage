@@ -2,7 +2,7 @@
   <div class="cover">
     <img
       v-show="store.imgLoadStatus"
-      :src="bgUrl"
+      :src="bgUrl || undefined"
       class="bg"
       alt="cover"
       @load="imgLoadComplete"
@@ -13,13 +13,15 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { h, onBeforeUnmount, onMounted, ref } from "vue";
+import { ElMessage } from "element-plus";
 import { mainStore } from "@/store";
 import { Error } from "@icon-park/vue-next";
 
 const store = mainStore();
-const bgUrl = ref(null);
-const imgTimeout = ref(null);
+const bgUrl = ref<string | null>(null);
+const imgTimeout = ref<ReturnType<typeof setTimeout> | null>(null);
 
 // 壁纸随机数
 // 请依据文件夹内的图片个数修改 Math.random() 后面的第一个数字
@@ -59,7 +61,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  clearTimeout(imgTimeout.value);
+  if (imgTimeout.value) clearTimeout(imgTimeout.value);
 });
 </script>
 

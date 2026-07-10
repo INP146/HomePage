@@ -27,6 +27,45 @@ A developer-focused personal homepage built with Vue 3. It brings together proje
 - [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)
 - [Cloudflare Workers](https://workers.cloudflare.com/) (optional, for GitHub GraphQL data)
 
+## Deployment
+
+The shared Worker implementation is at `workers/github-api.ts`. It accepts `type=pinned` or `type=contributions`, `username`, and an optional `limit`.
+
+### Deploy a Full Cloudflare Worker
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/INP146/home)
+
+The full Cloudflare route uploads the Vite `dist/` output as Workers Static Assets and handles the API at the same-origin `/api/github` route.
+
+1. Create `.dev.vars` from `.dev.vars.example` and set `GITHUB_TOKEN`.
+2. Change the Worker name in `wrangler.jsonc` if needed.
+3. Deploy the assets and Worker together:
+
+   ```bash
+   pnpm deploy:cloudflare
+   ```
+
+The Cloudflare build mode reads `.env.cloudflare`, so the browser uses `/api/github`. Static asset requests do not invoke the Worker; only `/api/*` consumes Workers request quota.
+
+The Deploy to Cloudflare button uses this full Worker route. It requires a public GitHub or GitLab repository and prompts deployers to provide their own `GITHUB_TOKEN`.
+
+### Deploy a Separate API Worker
+
+This route keeps the frontend as a standard `dist/` deployment and is suitable for Docker, Nginx, Pages, or any other static host.
+
+1. Create `workers/.dev.vars` from `workers/.dev.vars.example` and set `GITHUB_TOKEN`.
+2. Change the Worker name in `workers/wrangler.jsonc` if needed, then deploy it:
+
+   ```bash
+   pnpm deploy:api
+   ```
+
+3. Set the deployed Worker URL in `VITE_GITHUB_API`, then run `pnpm build` and deploy `dist/` normally.
+
+`GITHUB_USERNAME` is optional because the frontend sends the GitHub username with each request. It can be configured as a Worker variable when using the API independently.
+
+Never expose `GITHUB_TOKEN` to the browser. Public GitHub activity and the contribution fallback can be affected by API availability, networking, and rate limits.
+
 ## Run Locally
 
 Node.js 18 or later is recommended.
@@ -111,15 +150,6 @@ The page uses the following sources:
 | Pinned repositories | Worker at `VITE_GITHUB_API`                     | Reads GitHub GraphQL pinned repositories. Local project links remain available when the Worker is unavailable. |
 | Contribution graph  | Worker, then a public contribution API fallback | Shows the past 365 days; an empty calendar is shown when no data is available.                                 |
 | Public activity     | GitHub REST API                                 | Fetches recent public events directly and displays up to three.                                                |
-
-The Worker source is at `workers/github-pinned-repos.js`. It accepts `type=pinned` or `type=contributions`, `username`, and an optional `limit`. Configure these Worker environment variables:
-
-```text
-GITHUB_TOKEN=GitHub personal access token
-GITHUB_USERNAME=default GitHub username
-```
-
-Deploy the Worker to Cloudflare and set `VITE_GITHUB_API` to its public URL. Never expose `GITHUB_TOKEN` to the browser. Public GitHub activity and the contribution fallback can be affected by API availability, networking, and rate limits.
 
 ## Docker
 
