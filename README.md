@@ -50,7 +50,6 @@ The button is the shortest route:
    - `VITE_GITHUB_USERNAME`
    - `VITE_SITE_AUTHOR`
    - `VITE_SITE_KEYWORDS`
-   - `VITE_SITE_URL`
    - `VITE_SITE_ICP`
    - `VITE_SOCIAL_EMAIL`, `VITE_SOCIAL_TWITTER`, `VITE_SOCIAL_TELEGRAM`, `VITE_SOCIAL_QQ`, `VITE_SOCIAL_BILIBILI`
 4. Deploy.
@@ -112,7 +111,6 @@ For local development or a separately hosted frontend, copy `.env.example` to `.
 VITE_SITE_NAME="HomePage"
 VITE_SITE_AUTHOR="INP146"
 VITE_SITE_KEYWORDS="INP146,INP"
-VITE_SITE_URL="inp.la"
 VITE_GITHUB_USERNAME="INP146"
 
 # Core social links: email address, Twitter/Telegram usernames, QQ number, and Bilibili user ID

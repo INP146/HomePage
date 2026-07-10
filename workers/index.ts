@@ -11,7 +11,6 @@ interface HomeWorkerEnv extends GithubWorkerEnv {
   VITE_SITE_AUTHOR?: string;
   VITE_SITE_ICP?: string;
   VITE_SITE_KEYWORDS?: string;
-  VITE_SITE_URL?: string;
 }
 
 const siteConfig = (env: HomeWorkerEnv) => ({
@@ -24,7 +23,6 @@ const siteConfig = (env: HomeWorkerEnv) => ({
   qq: env.VITE_SOCIAL_QQ || "",
   telegram: env.VITE_SOCIAL_TELEGRAM || "",
   twitter: env.VITE_SOCIAL_TWITTER || "",
-  url: env.VITE_SITE_URL || "",
 });
 
 export default {

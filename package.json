@@ -17,9 +17,6 @@
       "VITE_SITE_KEYWORDS": {
         "description": "Comma-separated keywords for the page metadata."
       },
-      "VITE_SITE_URL": {
-        "description": "Public site URL, including https://."
-      },
       "VITE_SITE_ICP": {
         "description": "ICP filing number. Leave empty when it does not apply."
       },

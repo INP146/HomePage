@@ -10,7 +10,6 @@ interface PublicSiteConfig {
   qq?: string;
   telegram?: string;
   twitter?: string;
-  url?: string;
 }
 
 const githubApi = import.meta.env.VITE_GITHUB_API || "https://gh-pinned-repo.inp.la/";
@@ -26,7 +25,6 @@ export const siteConfig = reactive({
   qq: import.meta.env.VITE_SOCIAL_QQ || "",
   telegram: import.meta.env.VITE_SOCIAL_TELEGRAM || "",
   twitter: import.meta.env.VITE_SOCIAL_TWITTER || "",
-  url: import.meta.env.VITE_SITE_URL || "",
 });
 
 const updateDocumentMetadata = (): void => {
@@ -51,7 +49,6 @@ export const loadRuntimeSiteConfig = async (): Promise<void> => {
     if (config.qq !== undefined) siteConfig.qq = config.qq;
     if (config.telegram !== undefined) siteConfig.telegram = config.telegram;
     if (config.twitter !== undefined) siteConfig.twitter = config.twitter;
-    if (config.url) siteConfig.url = config.url;
     updateDocumentMetadata();
   } catch (error) {
     console.warn("Runtime site configuration load failed", error);

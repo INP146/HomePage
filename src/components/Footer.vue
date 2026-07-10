@@ -22,15 +22,7 @@ const fullYear = new Date().getFullYear();
 
 const siteIcp = computed(() => siteConfig.icp);
 const siteAuthor = computed(() => siteConfig.author);
-const siteUrl = computed(() => {
-  const url = siteConfig.url;
-  if (!url) return siteAuthor.value ? `https://github.com/${siteAuthor.value}` : "/";
-  // 判断协议前缀
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    return "//" + url;
-  }
-  return url;
-});
+const siteUrl = computed(() => `https://github.com/${siteConfig.githubUsername}`);
 </script>
 
 <style lang="scss" scoped>
