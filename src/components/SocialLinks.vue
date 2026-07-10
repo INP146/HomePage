@@ -29,7 +29,7 @@ const socialLinks = computed(() => [
         {
           name: "Twitter",
           icon: "/images/icon/twitter.png",
-          url: `https://twitter.com/${siteConfig.twitter.replace(/^@/, "")}`,
+          url: `https://x.com/${siteConfig.twitter.replace(/^@/, "")}`,
         },
       ]
     : []),
