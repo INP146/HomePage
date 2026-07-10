@@ -82,19 +82,20 @@ The public GitHub API Worker is used by default. To use your own GitHub Token or
 The Worker uses a GitHub Token to request GraphQL data; the token is never exposed to the browser.
 
 1. Open [GitHub token settings](https://github.com/settings/personal-access-tokens/new), create a **fine-grained personal access token**, and select **Public Repositories (read-only)** for repository access.
-2. Run the following command and paste the token:
+2. Change the Worker name in `workers/wrangler.jsonc` if needed.
+3. Run the following command and paste the token; it writes the secret to the Worker with that name:
 
    ```bash
    pnpm exec wrangler secret put GITHUB_TOKEN --config workers/wrangler.jsonc
    ```
 
-3. Change the Worker name in `workers/wrangler.jsonc` if needed, then deploy:
+4. Deploy the Worker:
 
    ```bash
    pnpm deploy:api
    ```
 
-4. Set `VITE_GITHUB_API` in `.env` to the deployed Worker URL, then run `pnpm build` again.
+5. Set `VITE_GITHUB_API` in `.env` to the deployed Worker URL, then run `pnpm build` again.
 
 Use `.dev.vars` and `workers/.dev.vars` only for local `wrangler dev` testing. Do not commit them.
 

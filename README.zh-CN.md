@@ -82,19 +82,20 @@ pnpm build
 Worker 使用 GitHub Token 请求 GraphQL 数据，Token 不会暴露给浏览器。
 
 1. 打开 [GitHub Token 设置页](https://github.com/settings/personal-access-tokens/new)，创建 **fine-grained personal access token**；仓库访问范围选择 **Public Repositories (read-only)**。
-2. 执行以下命令并粘贴 Token：
+2. 按需修改 `workers/wrangler.jsonc` 中的 Worker 名称。
+3. 执行以下命令并粘贴 Token；该命令会将 Secret 写入此名称对应的 Worker：
 
    ```bash
    pnpm exec wrangler secret put GITHUB_TOKEN --config workers/wrangler.jsonc
    ```
 
-3. 按需修改 `workers/wrangler.jsonc` 中的 Worker 名称，再部署：
+4. 部署 Worker：
 
    ```bash
    pnpm deploy:api
    ```
 
-4. 将部署得到的 Worker URL 写入 `.env` 的 `VITE_GITHUB_API`，然后重新执行 `pnpm build`。
+5. 将部署得到的 Worker URL 写入 `.env` 的 `VITE_GITHUB_API`，然后重新执行 `pnpm build`。
 
 `.dev.vars` 与 `workers/.dev.vars` 仅用于本地 `wrangler dev` 测试，不要提交它们。
 

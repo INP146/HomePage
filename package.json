@@ -31,7 +31,7 @@
     "build:cloudflare": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p workers/tsconfig.json && vite build --mode cloudflare",
     "deploy": "pnpm deploy:cloudflare",
     "deploy:api": "wrangler deploy --config workers/wrangler.jsonc",
-    "deploy:cloudflare": "pnpm build:cloudflare && wrangler deploy --config wrangler.jsonc",
+    "deploy:cloudflare": "wrangler deploy --config wrangler.jsonc",
     "preview": "vite preview",
     "format": "prettier --write src/",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p workers/tsconfig.json",
