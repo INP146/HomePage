@@ -3,7 +3,7 @@
     <div class="loader">
       <div class="loader-circle" />
       <div class="loader-text">
-        <span class="name">
+        <span v-if="store.appLoadStatus" class="name">
           {{ siteName }}
         </span>
         <span class="tip"> Loading </span>

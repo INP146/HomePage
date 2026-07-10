@@ -24,19 +24,22 @@ export const siteConfig = reactive({
   icp: import.meta.env.VITE_SITE_ICP || "",
   keywords: import.meta.env.VITE_SITE_KEYWORDS || "HomePage",
   qq: import.meta.env.VITE_SOCIAL_QQ || "",
-  siteName: import.meta.env.VITE_SITE_NAME || "HomePage",
+  siteName: import.meta.env.VITE_SITE_NAME || "Home",
   telegram: import.meta.env.VITE_SOCIAL_TELEGRAM || "",
   twitter: import.meta.env.VITE_SOCIAL_TWITTER || "",
 });
 
-const updateDocumentMetadata = (): void => {
+export const updateDocumentMetadata = (): void => {
   document.title = siteConfig.siteName;
   document.querySelector('meta[name="author"]')?.setAttribute("content", siteConfig.author);
   document.querySelector('meta[name="keywords"]')?.setAttribute("content", siteConfig.keywords);
 };
 
 export const loadRuntimeSiteConfig = async (): Promise<void> => {
-  if (githubApi !== "/api/github") return;
+  if (githubApi !== "/api/github") {
+    updateDocumentMetadata();
+    return;
+  }
 
   try {
     const response = await fetch("/api/config");
@@ -53,8 +56,9 @@ export const loadRuntimeSiteConfig = async (): Promise<void> => {
     if (config.siteName) siteConfig.siteName = config.siteName;
     if (config.telegram !== undefined) siteConfig.telegram = config.telegram;
     if (config.twitter !== undefined) siteConfig.twitter = config.twitter;
-    updateDocumentMetadata();
   } catch (error) {
     console.warn("Runtime site configuration load failed", error);
+  } finally {
+    updateDocumentMetadata();
   }
 };
