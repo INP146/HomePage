@@ -4,10 +4,10 @@
   "main": "./workers/index.ts",
   "compatibility_date": "2026-07-10",
   "vars": {
-    "VITE_GITHUB_USERNAME": "",
-    "VITE_SITE_AUTHOR": "",
-    "VITE_SITE_KEYWORDS": "",
-    "VITE_SITE_NAME": "",
+    "VITE_GITHUB_USERNAME": "INP146",
+    "VITE_SITE_AUTHOR": "INP146",
+    "VITE_SITE_KEYWORDS": "INP146, INP",
+    "VITE_SITE_NAME": "Home",
   },
   "assets": {
     "directory": "./dist",
