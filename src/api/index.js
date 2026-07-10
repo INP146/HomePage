@@ -2,7 +2,7 @@ import siteLinks from "@/assets/siteLinks.json";
 import socialLinks from "@/assets/socialLinks.json";
 
 const githubApi = import.meta.env.VITE_GITHUB_API || "https://gh-pinned-repo.inp.la/";
-const fallbackUser = import.meta.env.VITE_SITE_ANTHOR || "INP146";
+const fallbackUser = import.meta.env.VITE_SITE_AUTHOR || "INP146";
 
 export const getGithubUser = () => {
   const githubLink = socialLinks.find((item) => item.name?.toLowerCase() === "github");

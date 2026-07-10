@@ -49,7 +49,7 @@ import {
 } from "@icon-park/vue-next";
 import socialLinks from "@/assets/socialLinks.json";
 
-const fallbackUser = import.meta.env.VITE_SITE_ANTHOR || "INP146";
+const fallbackUser = import.meta.env.VITE_SITE_AUTHOR || "INP146";
 const githubLink = socialLinks.find((item) => item.name?.toLowerCase() === "github");
 const githubUser = computed(() => {
   const url = githubLink?.url || "";

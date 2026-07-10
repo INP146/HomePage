@@ -1,222 +1,153 @@
-简体中文 | [English](./README_EN.md)
+# HomePage
 
-<p>
-<strong><h2>無名の主页</h2></strong>
-简单的小主页，原来的看够了，重新弄了一个
-</p>
+A developer-focused personal homepage built with Vue 3. It brings together projects, a GitHub contribution graph, and recent public GitHub activity in a responsive, PWA-enabled interface.
 
-![無名の主页](/screenshots/main.jpg)
+<p><b>English</b> | <a href="README.zh-CN.md">简体中文</a></p>
 
->主页的 Logo 字体已经过压缩，若用本站 Logo 以外的字母会变回默认字体，这里是 [完整字体](https://file.imsyy.top/font/Other/Pacifico-Regular.ttf)，若无法下载，可将字体目录下的 `Pacifico-Regular-all.ttf` 进行替换
+![Home preview](./screenshots/main.png)
 
-### Demo
+> This is a secondary development of [imsyy/home](https://github.com/imsyy/home). The music player, weather, time capsule, Hitokoto, and settings modules from the upstream project have been removed in favor of project and GitHub data presentation.
 
->由于 CDN 缓存原因，查看最新效果可能需要 `Ctrl` + `F5` 强制刷新浏览器缓存
+## Features
 
-- [無名の主页](https://www.imsyy.top)
-- [無名の主页 - Dev](https://home-imsyy.vercel.app)
-- [無名の主页 - 备用线路](https://home-5iw.pages.dev)
+- Random local wallpapers and a loading animation
+- Configurable site identity, social links, and ICP registration
+- Combined GitHub pinned repositories and local project links
+- GitHub contribution graph for the last year
+- Recent public GitHub activity timeline
+- Paginated project cards, mouse-wheel navigation, and responsive mobile layouts
+- PWA asset caching and update notifications
 
-### 功能
+## Stack
 
-- [x] 载入动画
-- [x] 日期及时间
-- [x] 音乐播放器
-- [x] 移动端适配
+- [Vue 3](https://vuejs.org/) + [Vite](https://vitejs.dev/)
+- [Pinia](https://pinia.vuejs.org/)
+- [Element Plus](https://element-plus.org/)
+- [Swiper](https://swiperjs.com/)
+- [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)
+- [Cloudflare Workers](https://workers.cloudflare.com/) (optional, for GitHub GraphQL data)
 
-### 自动部署
+## Run Locally
 
-如果遇到构建环境或者打包过程出现错误，则可以采用 `Github Actions` 来进行自动构建
-
-- 在成功 `fork` 仓库后，前往 `Actions` 页面，若您是首次开启，则会出现下面的提示，点击开启
-  
-  ![步骤1](/screenshots/step1.jpg)
-
-- 然后在仓库中进行任意修改后均会触发工作流的运行，在工作流完成后，会在下方生成一个可供下载的压缩包，这就是构建出的静态文件，可自行上传至服务器
-  
-  ![步骤2](/screenshots/step2.jpg)
-
-### 手动部署
-
-* **安装** [node.js](https://nodejs.org/zh-cn/) **环境**
-
-  > node > 16.16.0  
-  > npm > 8.15.0
-  
-* 然后以 **管理员权限** 运行 `cmd` 终端，并 `cd` 到 项目根目录
-* 在 `终端` 中输入：
+Node.js 18 or later is recommended.
 
 ```bash
-# 安装 pnpm
-npm install -g pnpm
-
-# 安装依赖
+# Install dependencies
 pnpm install
 
-# 预览
+# Start the development server (port 3000 by default)
 pnpm dev
 
-# 构建
+# Create a production build
 pnpm build
-```
-> 构建完成后，静态资源会在 **`dist` 目录** 中生成，可将 **`dist` 文件夹下的文件**上传至服务器，也可使用 `Vercel` 等托管平台一键导入并自动部署
 
-### Docker 部署
-
-> 安装及配置 Docker 将不在此处说明，请自行解决
-
-```bash
-# 构建
-docker build -t home .
-# 运行
-docker run -p 12445:12445 -d home
+# Preview the production build
+pnpm preview
 ```
 
-### 网站链接
+The static output is written to `dist/` and can be deployed to any static hosting provider.
 
-在 `src/assets/siteLinks.json` 中可以自定义网站链接（以指向自己的网站）:
+## Configure the Site
+
+The application reads configuration from the root `.env` file. Restart the development server or rebuild after changing it.
+
+```dotenv
+# Site information
+VITE_SITE_NAME="Home"
+VITE_SITE_AUTHOR="INP146"
+VITE_SITE_KEYWORDS="INP146,INP"
+VITE_SITE_URL="inp.la"
+VITE_SITE_LOGO="/images/icon/favicon.ico"
+VITE_SITE_MAIN_LOGO="/images/icon/logo.png"
+VITE_SITE_APPLE_LOGO="/images/icon/apple-touch-icon.png"
+
+# GitHub data API; the code has a default when it is omitted
+VITE_GITHUB_API="https://gh-api.inp.la/"
+
+# ICP registration; leave empty to hide it
+VITE_SITE_ICP=""
+```
+
+The GitHub username is first resolved from the `Github` entry in `src/assets/socialLinks.json`, then falls back to `VITE_SITE_AUTHOR`.
+
+### Social Links
+
+Edit `src/assets/socialLinks.json`. Each entry has a label, icon path, and URL:
 
 ```json
 {
-  "icon": "Blog",						
-  "name": "博客",						
-  "link": "https://blog.imsyy.top/"	
-},
-```
-
-其中 `icon` 网站链接的图标可以在 `src/components/Links/index.vue` 中添加:
-
-```js
-// 可前往 https://www.xicons.org 自行挑选并在此处引入
-// 此处引入的是 fa 类型
-import {
-  Link,
-  Blog,
-  CompactDisc,
-  Cloud,
-  Compass,
-  Book,
-  Fire,
-  LaptopCode,
-} from "@vicons/fa";
-
-...
-
-// 网站链接图标
-const siteIcon = {
-  Blog,
-  Cloud,
-  CompactDisc,
-  Compass,
-  Book,
-  Fire,
-  LaptopCode,
-};
-```
-
-### 社交链接
-
-在 `src/assets/socialLinks.json` 中可以自定义社交链接。
-
-### 音乐
-
->本项目采用了基于 `MetingJS` 的 `Aplayer` 音乐播放器，可实现快速自定义歌单  
->*仅支持 **中国大陆地区**
-
-请在 `.env` 文件中更改歌曲相关参数即可实现自定义歌单列表
-
-```bash
-# 歌曲 API 地址
-VITE_SONG_API = "https://api-meting.imsyy.top"
-# 歌曲服务器 ( netease-网易云, tencent-qq音乐 )
-VITE_SONG_SERVER = "netease"
-# 播放类型 ( song-歌曲, playlist-播放列表, album-专辑, search-搜索, artist-艺术家 )
-VITE_SONG_TYPE = "playlist"
-# 播放 ID
-VITE_SONG_ID = "7452421335"
-```
-
-### 字体
-
-现采用 `HarmonyOS Sans` 开源字体，采用字体拆分，提升加载速度
-
->由于本站 `CDN` 已开启防盗链，**非本站域名不可访问**，请将字体引入链接更改为下方内容，否则 **自定义字体将失效**
->
->`https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css`
-
-<details>
-<summary>旧版方式</summary>
-
->由于本项目引入了中文字体，需要压缩中文字体以提高网页加载速度（ 也可以取消使用中文字体 ）
-
-#### 中文字体去除繁体
-
-- 安装 `Python 3.7` 和 `pip`
-- 运行 `pip install fonttools`
-- 下载 [sc_unicode.txt](https://gist.githubusercontent.com/imaegoo/d64e5088b723c2e02c40985f55ff12db/raw/5ebd2ce49418c73459a9dfe050483409306a6c1d/sc_unicode.txt)
-- 运行 `pyftsubset 字体名称.ttf --unicodes-file=sc_unicode.txt`
-
-#### 字体进一步压缩
-
-- 编译安装 `Google woff2`
-
-```bash
-sudo apt-get install -y git g++ make
-git clone --recursive https://github.com/google/woff2.git
-cd woff2
-make clean all
-```
-
-- 再压缩字体
-
-```
-./woff2_compress ./字体名称.ttf
-```
-
-- 最终可对原字体进行缓加载，**先行加载压缩后的字体**
-
->详细信息可前往 [虹墨空间站](https://www.imaegoo.com/2020/chinese-font-compress/) 查看原文
-
-</details>
-
-### 网站图标及网站背景
-
-#### 网站背景
-
-可以在 `public/images` 中修改网站背景
-
-如果想要添加更多的本地图片作为网站背景，可以将图片重命名 `background+数字` 的形式，并在 `src/components/Background/index.vue` 中进行修改：
-
-```js
-
-if (type == 0) {
-  // 修改此处 Math.random() 后面的第一个数字为图片的数量
-  bgUrl.value = `/images/background${Math.floor(
-    Math.random() * 10 + 1
-  )}.webp`;
+  "name": "Github",
+  "icon": "/images/icon/github.png",
+  "url": "https://github.com/your-account"
 }
 ```
 
-#### 网站图标
+### Project Links
 
-可以在 `public/images/icon` 中修改网站图标。
+Edit `src/assets/siteLinks.json` to add projects. The page fetches GitHub pinned repositories first, then merges and de-duplicates these local entries by link.
 
-### 技术栈
+```json
+{
+  "icon": "Github",
+  "name": "My Project",
+  "description": "A short project description.",
+  "link": "https://github.com/your-account/my-project"
+}
+```
 
-* [Vue](https://cn.vuejs.org/)
-* [Vite](https://vitejs.cn/vite3-cn/)
-* [Pinia](https://pinia.vuejs.org/zh/)
-* [IconPark](https://iconpark.oceanengine.com/official)
-* [xicons](https://xicons.org/)
-* [Aplayer](https://aplayer.js.org/)
+`icon` may be one of `Github`, `Blog`, `Cloud`, `CompactDisc`, `Compass`, `Book`, `Fire`, or `LaptopCode`. It can also be an image URL, a `data:` URL, or an image path under `public/`.
 
-### API
+### Wallpapers and Icons
 
-* [小歪 API](https://api.aixiaowai.cn)
-* [搏天 API](https://api.btstu.cn/doc/sjbz.php)
+- Put wallpapers in `public/images/` as `background1.jpg` through `background4.jpg`; the current component selects one at random.
+- Site icons live in `public/images/icon/`. Replace the files or update the paths in `.env`.
 
-## Star History
+## GitHub Data
 
-[![Star History Chart](https://api.star-history.com/svg?repos=imsyy/home&type=Date)](https://star-history.com/#imsyy/home&Date)
+The page uses the following sources:
 
-<a title="SSL" target="_blank" href="https://myssl.com/seal/detail?domain=blog.imsyy.top"><img src="https://img.shields.io/badge/MySSL-安全认证-brightgreen"></a>&nbsp;<a title="CDN" target="_blank" href="https://cdnjs.com/"><img src="https://img.shields.io/badge/CDN-Cloudflare-blue"></a>&nbsp;<a title="Copyright" target="_blank" href="https://imsyy.top/"><img src="https://img.shields.io/badge/Copyright%20%C2%A9%202020--2023-%E7%84%A1%E5%90%8D-red"></a>
+| Content             | Source                                          | Notes                                                                                                          |
+| ------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Pinned repositories | Worker at `VITE_GITHUB_API`                     | Reads GitHub GraphQL pinned repositories. Local project links remain available when the Worker is unavailable. |
+| Contribution graph  | Worker, then a public contribution API fallback | Shows the past 365 days; an empty calendar is shown when no data is available.                                 |
+| Public activity     | GitHub REST API                                 | Fetches recent public events directly and displays up to three.                                                |
+
+The Worker source is at `workers/github-pinned-repos.js`. It accepts `type=pinned` or `type=contributions`, `username`, and an optional `limit`. Configure these Worker environment variables:
+
+```text
+GITHUB_TOKEN=GitHub personal access token
+GITHUB_USERNAME=default GitHub username
+```
+
+Deploy the Worker to Cloudflare and set `VITE_GITHUB_API` to its public URL. Never expose `GITHUB_TOKEN` to the browser. Public GitHub activity and the contribution fallback can be affected by API availability, networking, and rate limits.
+
+## Docker
+
+```bash
+# Build and run
+docker compose up --build -d
+```
+
+The container listens on port `12445`: `http://localhost:12445`.
+
+Or use Docker directly:
+
+```bash
+docker build -t home .
+docker run --rm -p 12445:12445 home
+```
+
+## Acknowledgements, Copyright, and License
+
+This project is a secondary development of [imsyy/home](https://github.com/imsyy/home). Thanks to the original author, [imsyy](https://github.com/imsyy), for the open-source project and design foundation. This repository is not an official upstream release.
+
+Copyright ownership is declared as follows:
+
+```text
+Copyright (c) 2022 imsyy              # Upstream project and retained original content
+Copyright (c) 2026 @INP146            # Secondary development in this repository
+```
+
+Redistributions of this project or substantial portions of it must retain both copyright notices and the full [MIT License](./LICENSE).
+
+Unless otherwise noted, this project and the retained upstream code are released under the [MIT License](./LICENSE), and are provided "as is" without warranty of any kind.
