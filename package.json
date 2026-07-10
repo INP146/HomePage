@@ -1,8 +1,8 @@
 {
-  "name": "home",
+  "name": "homepage",
   "author": "INP146",
-  "github": "https://github.com/INP146/home",
-  "home": "https://inp.la",
+  "github": "https://github.com/INP146/HomePage",
+  "homepage": "https://inp.la",
   "private": true,
   "version": "4.1.4",
   "type": "module",

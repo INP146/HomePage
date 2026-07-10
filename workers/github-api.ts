@@ -123,7 +123,7 @@ const graphql = async <T>(
     headers: {
       Authorization: `Bearer ${env.GITHUB_TOKEN}`,
       "Content-Type": "application/json",
-      "User-Agent": "home-github-api-worker",
+      "User-Agent": "homepage-github-api-worker",
     },
     body: JSON.stringify({ query, variables }),
   });

@@ -33,7 +33,7 @@
 
 ### Cloudflare 一体化部署
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/INP146/home)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/INP146/HomePage)
 
 一体化路线会将 Vite 的 `dist/` 上传为 Workers Static Assets，并在同源 `/api/github` 处理 GitHub API。
 
@@ -92,7 +92,7 @@ pnpm preview
 
 ```dotenv
 # 站点基本信息
-VITE_SITE_NAME="Home"
+VITE_SITE_NAME="HomePage"
 VITE_SITE_AUTHOR="INP146"
 VITE_SITE_KEYWORDS="INP146,INP"
 VITE_SITE_URL="inp.la"
@@ -163,8 +163,8 @@ docker compose up --build -d
 也可以直接使用 Docker：
 
 ```bash
-docker build -t home .
-docker run --rm -p 12445:12445 home
+docker build -t homepage .
+docker run --rm -p 12445:12445 homepage
 ```
 
 ## 鸣谢、版权与许可证

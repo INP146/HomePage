@@ -33,7 +33,7 @@ The shared Worker implementation is at `workers/github-api.ts`. It accepts `type
 
 ### Deploy a Full Cloudflare Worker
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/INP146/home)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/INP146/HomePage)
 
 The full Cloudflare route uploads the Vite `dist/` output as Workers Static Assets and handles the API at the same-origin `/api/github` route.
 
@@ -92,7 +92,7 @@ The application reads configuration from the root `.env` file. Restart the devel
 
 ```dotenv
 # Site information
-VITE_SITE_NAME="Home"
+VITE_SITE_NAME="HomePage"
 VITE_SITE_AUTHOR="INP146"
 VITE_SITE_KEYWORDS="INP146,INP"
 VITE_SITE_URL="inp.la"
@@ -163,8 +163,8 @@ The container listens on port `12445`: `http://localhost:12445`.
 Or use Docker directly:
 
 ```bash
-docker build -t home .
-docker run --rm -p 12445:12445 home
+docker build -t homepage .
+docker run --rm -p 12445:12445 homepage
 ```
 
 ## Acknowledgements, Copyright, and License
