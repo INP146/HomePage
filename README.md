@@ -45,6 +45,17 @@ The button is the shortest route:
    - To configure an ICP record or social links, add these public variables as needed under the form's **Advanced settings**: `VITE_SITE_ICP`, `VITE_SOCIAL_EMAIL`, `VITE_SOCIAL_TWITTER`, `VITE_SOCIAL_TELEGRAM`, `VITE_SOCIAL_QQ`, and `VITE_SOCIAL_BILIBILI`.
 4. Deploy.
 
+You can also deploy from a fork through Git integration, which makes it easy to keep up with updates from this repository:
+
+1. Fork this repository and update `wrangler.jsonc` in your fork as needed, for example the Worker name and public site variables.
+2. Sign in to the Cloudflare Dashboard, create an application under **Workers & Pages**, select **Continue with GitHub**, and choose your fork.
+3. Enter these commands:
+   - Build command: `pnpm build:cloudflare`
+   - Deploy command: `pnpm deploy:cloudflare`
+4. Configure `GITHUB_TOKEN` and the other site variables as prompted, then deploy.
+
+You can later use GitHub's **Sync fork** action to pull in updates from this repository; the resulting commit triggers an automatic Cloudflare deployment.
+
 ### Self-host the Frontend
 
 Copy `.env.example` to `.env`, set at least your GitHub username, and adjust the remaining site fields as needed:

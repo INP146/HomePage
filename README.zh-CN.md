@@ -45,6 +45,17 @@
    - 如需配置备案或社交链接，请在表单的“高级设置”中按需添加以下公开变量：`VITE_SITE_ICP`、`VITE_SOCIAL_EMAIL`、`VITE_SOCIAL_TWITTER`、`VITE_SOCIAL_TELEGRAM`、`VITE_SOCIAL_QQ`、`VITE_SOCIAL_BILIBILI`。
 4. 完成部署。
 
+也可以通过 Fork 和 Git 集成部署，以便后续同步本仓库的更新：
+
+1. Fork 本仓库，并按需修改 Fork 中的 `wrangler.jsonc`，例如 Worker 名称和公开站点变量。
+2. 登录 Cloudflare Dashboard，在 **Workers 和 Pages** 中创建应用，选择 **Continue with GitHub**，并选择 Fork 的仓库。
+3. 填写以下命令：
+   - 构建命令：`pnpm build:cloudflare`
+   - 部署命令：`pnpm deploy:cloudflare`
+4. 按提示配置 `GITHUB_TOKEN` 和其他站点变量后完成部署。
+
+之后可在 GitHub 中使用 **Sync fork** 同步本仓库的更新；同步产生的新提交会触发 Cloudflare 自动重新部署。
+
 ### 自行部署
 
 将 `.env.example` 复制为 `.env`，至少填写 GitHub 用户名；其余站点字段可按需修改：
