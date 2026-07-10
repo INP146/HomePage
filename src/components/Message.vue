@@ -11,10 +11,10 @@
 </template>
 
 <script setup lang="ts">
-// 主页站点logo
-const siteLogo = import.meta.env.VITE_SITE_MAIN_LOGO;
-// 站点名称
-const siteName = import.meta.env.VITE_SITE_NAME || "Homepage";
+import { computed } from "vue";
+import { siteConfig } from "@/config/site";
+
+const siteName = computed(() => siteConfig.siteName);
 </script>
 
 <style lang="scss" scoped>

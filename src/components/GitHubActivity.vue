@@ -2,186 +2,151 @@
   <section class="github-activity">
     <div class="activity-card cards">
       <div v-if="activityGroups.length" class="groups">
-        <div v-for="group in activityGroups" :key="group.month" class="group">
-          <div class="month-row">
-            <span>{{ group.month }}</span>
-            <i></i>
+        <article v-for="group in activityGroups" :key="group.date" class="activity-day">
+          <div class="event-icon">
+            <Code theme="outline" size="18" fill="#a9b1ba" />
           </div>
-          <div class="timeline">
-            <article v-for="item in group.items" :key="item.id" class="event">
-              <div class="event-icon">
-                <component :is="item.icon" theme="outline" size="18" fill="#a9b1ba" />
+          <div class="event-body">
+            <div class="event-top">
+              <h3>
+                Created {{ group.totalCommits }} commit{{ group.totalCommits === 1 ? "" : "s" }} in
+                {{ group.repositories.length }}
+                {{ group.repositories.length === 1 ? "repository" : "repositories" }}
+              </h3>
+              <span>{{ group.dateLabel }}</span>
+            </div>
+            <div class="repo-list">
+              <div v-for="repository in group.repositories" :key="repository.repo" class="repo-row">
+                <div class="repo-meta">
+                  <a :href="repository.url" target="_blank" rel="noreferrer">
+                    {{ repository.repo }}
+                  </a>
+                  <span
+                    >{{ repository.commits }} commit{{ repository.commits === 1 ? "" : "s" }}</span
+                  >
+                </div>
+                <div class="event-bar">
+                  <i :style="{ width: `${repository.percentage}%` }"></i>
+                </div>
               </div>
-              <div class="event-body">
-                <div class="event-top">
-                  <h3>{{ item.title }}</h3>
-                  <span>{{ item.dateLabel }}</span>
-                </div>
-                <div class="event-meta">
-                  <a :href="item.repoUrl" target="_blank" rel="noreferrer">{{ item.repo }}</a>
-                  <span v-if="item.detail">{{ item.detail }}</span>
-                </div>
-                <div v-if="item.level" class="event-bar">
-                  <i :style="{ width: `${item.level}%` }"></i>
-                </div>
-              </div>
-            </article>
+            </div>
           </div>
-        </div>
+        </article>
       </div>
 
       <div v-else class="empty">
-        <span>{{ isLoading ? "Loading activity" : "No recent public activity" }}</span>
+        <span>{{ isLoading ? "Loading activity" : "No recent public commit activity" }}</span>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, type Component } from "vue";
-import { Branch, Code, FolderCode, Fork, History, PullRequests, Star } from "@icon-park/vue-next";
+import { computed, onMounted, ref } from "vue";
+import { Code } from "@icon-park/vue-next";
 import { siteConfig } from "@/config/site";
 
 interface GithubEvent {
-  id: string;
   type?: string;
   created_at: string;
   repo?: { name?: string };
-  payload?: { action?: string; commits?: unknown[]; ref_type?: string };
+  payload?: { commits?: unknown[]; ref?: string | null; size?: number };
 }
 
-interface ActivityDescription {
-  title: string;
-  detail: string;
-  icon: Component;
+interface RepositoryActivity {
   repo: string;
-  level?: number;
-}
-
-interface TimelineItem extends ActivityDescription {
-  id: string;
-  repoUrl: string;
-  month: string;
-  dateLabel: string;
+  url: string;
+  commits: number;
+  percentage: number;
 }
 
 interface ActivityGroup {
-  month: string;
-  items: TimelineItem[];
+  date: string;
+  dateLabel: string;
+  totalCommits: number;
+  repositories: RepositoryActivity[];
 }
 
 const githubUser = computed(() => siteConfig.githubUsername);
 
 const events = ref<GithubEvent[]>([]);
 const isLoading = ref(true);
-const monthFormatter = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" });
 const dayFormatter = new Intl.DateTimeFormat("en", { month: "short", day: "numeric" });
+const visibleActivityDays = 4;
 
 const repoUrl = (repo: string): string => `https://github.com/${repo}`;
 
-const describeCreateEvent = (event: GithubEvent): Pick<ActivityDescription, "title" | "icon"> => {
-  const type = event.payload?.ref_type;
-  if (type === "repository") return { title: "Created 1 repository", icon: FolderCode };
-  if (type === "branch") return { title: "Created 1 branch", icon: Branch };
-  if (type === "tag") return { title: "Created 1 tag", icon: Branch };
-  return { title: "Created 1 item", icon: FolderCode };
+const getPushCommitCount = (event: GithubEvent): number => {
+  const reportedCommits = event.payload?.size || event.payload?.commits?.length;
+  if (reportedCommits) return reportedCommits;
+
+  // GitHub can omit the commit list and size from public PushEvent payloads.
+  return event.payload?.ref ? 1 : 0;
 };
-
-const describeEvent = (event: GithubEvent): ActivityDescription => {
-  const repo = event.repo?.name || `${githubUser.value}/GitHub`;
-  const commits = event.payload?.commits?.length || 0;
-
-  if (event.type === "PushEvent") {
-    const count = commits || 1;
-    return {
-      title: `Created ${count} commit${count > 1 ? "s" : ""} in 1 repository`,
-      detail: `${count} commit${count > 1 ? "s" : ""}`,
-      icon: Code,
-      level: Math.min(100, Math.max(32, count * 28)),
-      repo,
-    };
-  }
-
-  if (event.type === "CreateEvent") {
-    return {
-      ...describeCreateEvent(event),
-      detail: "",
-      repo,
-    };
-  }
-
-  if (event.type === "WatchEvent") {
-    return {
-      title: "Starred 1 repository",
-      detail: "",
-      icon: Star,
-      repo,
-    };
-  }
-
-  if (event.type === "ForkEvent") {
-    return {
-      title: "Forked 1 repository",
-      detail: "",
-      icon: Fork,
-      repo,
-    };
-  }
-
-  if (event.type === "PullRequestEvent") {
-    return {
-      title: `${event.payload?.action || "Updated"} 1 pull request`,
-      detail: "",
-      icon: PullRequests,
-      repo,
-    };
-  }
-
-  return {
-    title: event.type?.replace("Event", "") || "GitHub activity",
-    detail: "",
-    icon: History,
-    repo,
-  };
-};
-
-const timelineItems = computed(() =>
-  events.value.slice(0, 3).map((event) => {
-    const date = new Date(event.created_at);
-    const description = describeEvent(event);
-    return {
-      id: event.id,
-      ...description,
-      repoUrl: repoUrl(description.repo),
-      month: monthFormatter.format(date),
-      dateLabel: dayFormatter.format(date),
-    };
-  }),
-);
 
 const activityGroups = computed(() => {
-  const groups: ActivityGroup[] = [];
-  timelineItems.value.forEach((item) => {
-    const group = groups.find((entry) => entry.month === item.month);
-    if (group) {
-      group.items.push(item);
-    } else {
-      groups.push({ month: item.month, items: [item] });
-    }
+  const groups = new Map<string, Map<string, number>>();
+
+  events.value.forEach((event) => {
+    if (event.type !== "PushEvent") return;
+
+    const commits = getPushCommitCount(event);
+    if (!commits) return;
+
+    const date = event.created_at.slice(0, 10);
+    const repo = event.repo?.name || `${githubUser.value}/GitHub`;
+    const repositories = groups.get(date) || new Map<string, number>();
+    repositories.set(repo, (repositories.get(repo) || 0) + commits);
+    groups.set(date, repositories);
   });
-  return groups;
+
+  return [...groups.entries()]
+    .sort(([left], [right]) => right.localeCompare(left))
+    .slice(0, visibleActivityDays)
+    .map(([date, repositories]): ActivityGroup => {
+      const totalCommits = [...repositories.values()].reduce((total, count) => total + count, 0);
+      return {
+        date,
+        dateLabel: dayFormatter.format(new Date(`${date}T00:00:00`)),
+        totalCommits,
+        repositories: [...repositories.entries()]
+          .sort(([, left], [, right]) => right - left)
+          .map(([repo, commits]) => ({
+            repo,
+            url: repoUrl(repo),
+            commits,
+            percentage: Math.round((commits / totalCommits) * 100),
+          })),
+      };
+    });
 });
 
 const loadActivity = async (): Promise<void> => {
   isLoading.value = true;
   try {
-    const response = await fetch(
-      `https://api.github.com/users/${githubUser.value}/events/public?per_page=12`,
-    );
-    if (response.ok) {
+    const collectedEvents: GithubEvent[] = [];
+
+    for (let page = 1; page <= 3; page += 1) {
+      const response = await fetch(
+        `https://api.github.com/users/${githubUser.value}/events/public?per_page=100&page=${page}`,
+      );
+      if (!response.ok) break;
+
       const data: unknown = await response.json();
-      events.value = Array.isArray(data) ? (data as GithubEvent[]) : [];
+      if (!Array.isArray(data)) break;
+
+      const pageEvents = data as GithubEvent[];
+      collectedEvents.push(...pageEvents);
+
+      const dates = new Set(
+        collectedEvents
+          .filter((event) => event.type === "PushEvent" && getPushCommitCount(event))
+          .map((event) => event.created_at.slice(0, 10)),
+      );
+      if (dates.size >= visibleActivityDays || pageEvents.length < 100) break;
     }
+
+    events.value = collectedEvents;
   } catch (error) {
     console.warn("GitHub activity load failed", error);
   } finally {
@@ -203,67 +168,26 @@ onMounted(loadActivity);
     flex: 1 1 auto;
     min-height: 0;
     max-height: none;
-    padding: 14px 16px;
+    padding: 14px 16px 14px;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     animation: fade 0.5s;
   }
 
-  .group {
-    & + .group {
-      margin-top: 12px;
-    }
-  }
-
-  .month-row {
+  .groups {
     display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 10px;
-
-    span {
-      color: #f0f6fc;
-      font-size: 1rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    i {
-      flex: 1 1 auto;
-      height: 1px;
-      background: #ffffff33;
-    }
-  }
-
-  .timeline {
-    position: relative;
-    padding-left: 28px;
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 2px;
-      bottom: 2px;
-      left: 11px;
-      width: 2px;
-      background: #8b949e55;
-    }
-  }
-
-  .event {
-    position: relative;
-    display: flex;
-    gap: 14px;
-    padding-bottom: 10px;
-
-    &:last-child {
-      padding-bottom: 2px;
-    }
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    gap: 22px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .event-icon {
-    position: absolute;
-    top: -1px;
-    left: -28px;
+    flex: 0 0 auto;
     width: 26px;
     height: 26px;
     border-radius: 50%;
@@ -271,13 +195,18 @@ onMounted(loadActivity);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1;
-
     .i-icon {
       width: 18px;
       height: 18px;
       display: block;
     }
+  }
+
+  .activity-day {
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr);
+    gap: 10px;
+    min-width: 0;
   }
 
   .event-body {
@@ -306,8 +235,22 @@ onMounted(loadActivity);
     }
   }
 
-  .event-meta {
-    margin-top: 5px;
+  .repo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 9px;
+  }
+
+  .repo-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .repo-meta {
+    flex: 1 1 auto;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -323,36 +266,40 @@ onMounted(loadActivity);
     a {
       min-width: 0;
       color: #f0f6fc;
-      font-size: 0.9rem;
-      border-bottom: 1px solid #ffffff55;
+      font-size: 0.85rem;
+      line-height: 1.2;
+      text-decoration: none;
+
+      &:hover {
+        color: #58a6ff;
+        text-decoration: underline;
+      }
     }
 
     span {
       flex: 0 0 auto;
       color: #ffffff99;
-      font-size: 0.85rem;
-      border-bottom: 1px solid #ffffff55;
+      font-size: 0.75rem;
     }
   }
 
   .event-bar {
-    margin-top: 8px;
-    width: 100%;
-    height: 6px;
-    border-radius: 6px;
+    flex: 0 1 38%;
+    min-width: 64px;
+    height: 2px;
+    margin: 0;
     background: #161b2280;
     overflow: hidden;
 
     i {
       display: block;
       height: 100%;
-      border-radius: inherit;
-      background: #2ea043;
+      background: #f0f6fc;
     }
   }
 
   .empty {
-    min-height: 210px;
+    min-height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -15,12 +15,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { mainStore } from "@/store";
+import { siteConfig } from "@/config/site";
 
 const store = mainStore();
 
 // 配置
-const siteName = import.meta.env.VITE_SITE_NAME;
+const siteName = computed(() => siteConfig.siteName);
 </script>
 
 <style lang="scss" scoped>

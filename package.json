@@ -17,23 +17,8 @@
       "VITE_SITE_KEYWORDS": {
         "description": "Comma-separated keywords for the page metadata."
       },
-      "VITE_SITE_ICP": {
-        "description": "ICP filing number. Leave empty when it does not apply."
-      },
-      "VITE_SOCIAL_EMAIL": {
-        "description": "Email address used for the Email social link."
-      },
-      "VITE_SOCIAL_TWITTER": {
-        "description": "Twitter username without @. Leave empty to hide the link."
-      },
-      "VITE_SOCIAL_TELEGRAM": {
-        "description": "Telegram username without @. Leave empty to hide the link."
-      },
-      "VITE_SOCIAL_QQ": {
-        "description": "QQ number. Leave empty to hide the link."
-      },
-      "VITE_SOCIAL_BILIBILI": {
-        "description": "Bilibili user ID. Leave empty to hide the link."
+      "VITE_SITE_NAME": {
+        "description": "Site name shown in the loader, page header, and browser title."
       }
     }
   },

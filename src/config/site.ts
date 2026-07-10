@@ -8,6 +8,7 @@ interface PublicSiteConfig {
   icp?: string;
   keywords?: string;
   qq?: string;
+  siteName?: string;
   telegram?: string;
   twitter?: string;
 }
@@ -23,11 +24,13 @@ export const siteConfig = reactive({
   icp: import.meta.env.VITE_SITE_ICP || "",
   keywords: import.meta.env.VITE_SITE_KEYWORDS || "HomePage",
   qq: import.meta.env.VITE_SOCIAL_QQ || "",
+  siteName: import.meta.env.VITE_SITE_NAME || "HomePage",
   telegram: import.meta.env.VITE_SOCIAL_TELEGRAM || "",
   twitter: import.meta.env.VITE_SOCIAL_TWITTER || "",
 });
 
 const updateDocumentMetadata = (): void => {
+  document.title = siteConfig.siteName;
   document.querySelector('meta[name="author"]')?.setAttribute("content", siteConfig.author);
   document.querySelector('meta[name="keywords"]')?.setAttribute("content", siteConfig.keywords);
 };
@@ -47,6 +50,7 @@ export const loadRuntimeSiteConfig = async (): Promise<void> => {
     if (config.icp !== undefined) siteConfig.icp = config.icp;
     if (config.keywords) siteConfig.keywords = config.keywords;
     if (config.qq !== undefined) siteConfig.qq = config.qq;
+    if (config.siteName) siteConfig.siteName = config.siteName;
     if (config.telegram !== undefined) siteConfig.telegram = config.telegram;
     if (config.twitter !== undefined) siteConfig.twitter = config.twitter;
     updateDocumentMetadata();

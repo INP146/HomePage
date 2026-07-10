@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import { ElMessage } from "element-plus";
+import "element-plus/es/components/message/style/css";
 import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import "@/style/style.scss";

@@ -50,8 +50,7 @@ The button is the shortest route:
    - `VITE_GITHUB_USERNAME`
    - `VITE_SITE_AUTHOR`
    - `VITE_SITE_KEYWORDS`
-   - `VITE_SITE_ICP`
-   - `VITE_SOCIAL_EMAIL`, `VITE_SOCIAL_TWITTER`, `VITE_SOCIAL_TELEGRAM`, `VITE_SOCIAL_QQ`, `VITE_SOCIAL_BILIBILI`
+   - `VITE_SITE_NAME`
 4. Deploy.
 
 To deploy from your local checkout instead:

@@ -11,18 +11,20 @@ interface HomeWorkerEnv extends GithubWorkerEnv {
   VITE_SITE_AUTHOR?: string;
   VITE_SITE_ICP?: string;
   VITE_SITE_KEYWORDS?: string;
+  VITE_SITE_NAME?: string;
 }
 
 const siteConfig = (env: HomeWorkerEnv) => ({
   author: env.VITE_SITE_AUTHOR || "",
-  bilibili: env.VITE_SOCIAL_BILIBILI || "",
-  email: env.VITE_SOCIAL_EMAIL || "",
   githubUsername: env.VITE_GITHUB_USERNAME || "",
-  icp: env.VITE_SITE_ICP || "",
   keywords: env.VITE_SITE_KEYWORDS || "",
-  qq: env.VITE_SOCIAL_QQ || "",
-  telegram: env.VITE_SOCIAL_TELEGRAM || "",
-  twitter: env.VITE_SOCIAL_TWITTER || "",
+  siteName: env.VITE_SITE_NAME || "",
+  ...(env.VITE_SITE_ICP ? { icp: env.VITE_SITE_ICP } : {}),
+  ...(env.VITE_SOCIAL_BILIBILI ? { bilibili: env.VITE_SOCIAL_BILIBILI } : {}),
+  ...(env.VITE_SOCIAL_EMAIL ? { email: env.VITE_SOCIAL_EMAIL } : {}),
+  ...(env.VITE_SOCIAL_QQ ? { qq: env.VITE_SOCIAL_QQ } : {}),
+  ...(env.VITE_SOCIAL_TELEGRAM ? { telegram: env.VITE_SOCIAL_TELEGRAM } : {}),
+  ...(env.VITE_SOCIAL_TWITTER ? { twitter: env.VITE_SOCIAL_TWITTER } : {}),
 });
 
 export default {
