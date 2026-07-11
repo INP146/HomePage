@@ -52,7 +52,6 @@ You can also deploy from a fork through Git integration, which makes it easy to 
 3. Enter these commands:
    - Build command: `pnpm build:cloudflare`
    - Deploy command: `pnpm deploy:cloudflare`
-4. Configure `GITHUB_TOKEN` and the other site variables as prompted, then deploy.
 
 You can later use GitHub's **Sync fork** action to pull in updates from this repository; the resulting commit triggers an automatic Cloudflare deployment.
 
