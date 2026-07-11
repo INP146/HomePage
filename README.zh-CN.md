@@ -52,6 +52,7 @@
 3. 填写以下命令：
    - 构建命令：`pnpm build:cloudflare`
    - 部署命令：`pnpm deploy:cloudflare`
+4. 在表单的“高级设置”中配置（加密）`GITHUB_TOKEN`。
 
 之后可在 GitHub 中使用 **Sync fork** 同步本仓库的更新；同步产生的新提交会触发 Cloudflare 自动重新部署。
 
