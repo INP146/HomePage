@@ -15,7 +15,7 @@
         <span
           v-for="month in monthLabels"
           :key="`${month.label}-${month.column}`"
-          :style="{ gridColumn: `${month.column} / span ${month.span}` }"
+          :style="{ gridColumn: `${month.column}`, gridRow: '1' }"
         >
           {{ month.label }}
         </span>
@@ -63,7 +63,6 @@ interface CalendarDay extends GithubContribution {}
 interface MonthLabel {
   label: string;
   column: number;
-  span: number;
 }
 
 const store = mainStore();
@@ -144,7 +143,6 @@ const monthLabels = computed(() => {
       labels.push({
         label: month,
         column: weekIndex + 1,
-        span: 4,
       });
       previousMonth = month;
     }
